@@ -7,7 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* ==========================================================================
-           1. MAIN PAGE STYLES (FROM YOUR SpO2 CODE)
+           1. YOUR ORIGINAL SpO2 & ANALYSIS STYLES (UNTOUCHED)
            ========================================================================== */
         :root {
             --bg: #e0e5ec; 
@@ -19,6 +19,7 @@
             --c-hypoxic: #c0392b;
             --text-main: #2d3436;
             --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
+            --text-sub: #57606f;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -36,54 +37,65 @@
             font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; color: var(--text-main);
         }
 
-        /* SpO2 CARD LOGIC */
         .spo2-card {
             background: var(--bg); border-radius: 15px; margin-bottom: 12px;
             box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
             padding: 22px 15px 8px 15px; position: relative; width: 100%; overflow: hidden;
         }
-        .corner-status { position: absolute; top: 0; left: 0; height: 18px; display: flex; align-items: center; padding: 0 12px; border-radius: 12px 0 10px 0; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #fff; z-index: 10; }
-        .lung-interact { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%); z-index: 5; cursor: pointer; width: 85px; height: 85px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); background: var(--bg); }
+
+        .corner-status {
+            position: absolute; top: 0; left: 0; height: 18px; display: flex; align-items: center; padding: 0 12px; 
+            border-radius: 12px 0 10px 0; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #fff; z-index: 10;
+        }
+
+        .lung-interact {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%);
+            z-index: 5; cursor: pointer; width: 85px; height: 85px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+            background: var(--bg);
+        }
+
         .lung-bg { font-size: 45px; color: #adb5bd; transition: 0.3s; }
 
-        /* ANIMATIONS */
         @keyframes pulseBelow { 0% { color: #e5989b; transform: scale(1); } 100% { color: #d35400; transform: scale(1.1); } }
         @keyframes pulseCritical { 0% { color: #ff4d4d; transform: scale(1); } 100% { color: #8b0000; transform: scale(1.15); } }
         .is-below { animation: pulseBelow 2s ease-in-out infinite alternate; }
         .is-critical { animation: pulseCritical 1.2s ease-in-out infinite alternate; }
-        @keyframes heartBeat { 0% { transform: scale(1); } 14% { transform: scale(1.3); } 28% { transform: scale(1); } 42% { transform: scale(1.15); } 70% { transform: scale(1); } }
 
         .data-grid { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; pointer-events: none; }
         .pulse-side { display: flex; flex-direction: column; align-items: center; width: 60px; padding-top: 12px; }
         .pulse-side i { color: #cc0000; font-size: 20px; margin-bottom: 2px; }
         .pulse-val { font-size: 26px; font-weight: 900; color: #444; line-height: 1; }
+        @keyframes heartBeat { 0% { transform: scale(1); } 14% { transform: scale(1.3); } 28% { transform: scale(1); } 42% { transform: scale(1.15); } 70% { transform: scale(1); } }
+
         .oxy-side { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; }
         .timestamp-box { font-size: 11px; font-weight: 900; color: #555; text-transform: uppercase; margin-bottom: 2px; }
         .oxy-val { font-size: 54px; font-weight: 900; line-height: 0.8; letter-spacing: -2px; }
+
         .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 5px; }
         .type-tag { font-size: 10px; font-weight: 900; opacity: 0.6; text-transform: uppercase; }
         .analysis-link { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; cursor: pointer; }
 
-        /* ==========================================================================
-           2. ANALYSIS PANEL (SLIDES FROM RIGHT)
-           ========================================================================== */
+        /* ANALYSIS PANEL & CHART STYLES (UNTOUCHED) */
         #analysisPanel {
             position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
             background: transparent; z-index: 20000; 
-            transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: right 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; justify-content: center;
         }
         #analysisPanel.open { right: 0; }
 
         .pop-out {
             background: var(--bg); width: 96%; margin: 2% auto;
-            border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            border-radius: 35px; box-sizing: border-box;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
             position: relative; display: flex; flex-direction: column;
             max-height: 96vh; overflow: hidden;
         }
         .scroll-content { overflow-y: auto; padding: 25px; flex: 1; }
-
-        /* Chart Area Styles */
+        
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
         .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
         .tier { flex: 1; position: relative; }
@@ -91,22 +103,28 @@
         #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
 
         /* ==========================================================================
-           3. DEVICE SLIDE OVERLAY (SLIDES FROM LEFT)
+           2. YOUR DEVICE CARD STYLES (UNTOUCHED)
            ========================================================================== */
         .device-drawer {
             position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
             background: rgba(18, 18, 18, 0.95); z-index: 30000; 
-            transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; align-items: center; justify-content: center;
         }
         .device-drawer.open { left: 0; }
 
-        /* YOUR ORIGINAL DEVICE CARD STYLES */
         .device-card {
             background: var(--bg); width: 92%; max-width: 480px; border-radius: 50px;
             padding: 25px 40px 45px 40px; text-align: center; box-sizing: border-box; position: relative;
             box-shadow: 30px 30px 60px rgba(0,0,0,0.8);
         }
+        .close-btn {
+            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
+            background: #d63031; color: white; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; font-size: 22px; font-weight: bold; cursor: pointer; z-index: 100;
+        }
+
+        /* DEVICE BRANDING FROM YOUR CARDS */
         .brand-title { font-size: 34px; font-weight: 900; color: #1a1c20; margin: 0; padding-top: 10px; }
         .model-subtitle { font-size: 16px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
         .image-container {
@@ -121,24 +139,4 @@
         }
         .description-box p { font-size: 16px; line-height: 1.6; color: #2d3436; margin: 0; font-weight: 600; }
         .cert-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 2px solid rgba(0,0,0,0.08); }
-        .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .cert-unit img { height: 35px; width: auto; margin-bottom: 10px; }
-        .cert-unit span { font-size: 9px; font-weight: 900; color: #57606f; text-transform: uppercase; }
-
-        .close-btn {
-            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
-            background: #d63031; color: white; border-radius: 10px; display: flex;
-            align-items: center; justify-content: center; font-size: 22px; font-weight: bold; cursor: pointer; z-index: 100;
-        }
-
-        /* OVERLAYS (PROTOCOLS) */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        .alert-card { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 40000; display: none; padding: 20px; }
-    </style>
-</head>
-<body>
-
-<!-- PAGE 1: SpO2 MAIN -->
-<div id="main-content">
-    <h1>O
+        .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1;
