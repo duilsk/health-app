@@ -2,162 +2,231 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dóchas Health</title>
-    <link rel="manifest" href="manifest.json">
-    <!-- This is the Square Icon for Apple -->
-    <link rel="apple-touch-icon" href="https://github.com/duilsk/health-app/blob/main/app_logo.png?raw=true">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dóchas Health | SpO2 Suite</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --dochas-blue: #2171b5;
-            --dochas-light: #e3f2fd;
-            --dochas-orange: #f39c12;
-            --text: #2c3e50;
+            --bg: #e0e5ec; 
+            --shadow-dark: #b8c1d1;
+            --shadow-light: #ffffff;
+            --c-optimal: #008080;
+            --c-normal: #2980b9;
+            --c-low: #d35400;
+            --c-hypoxic: #c0392b;
+            --text-main: #2d3436;
+            --text-sub: #57606f;
+            --accent: #0033cc;
         }
 
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: #f0f4f8;
-            margin: 0;
-            padding: 0;
-            color: var(--text);
-        }
-
-        .app-header {
-            background: white;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-bottom: 4px solid var(--dochas-blue);
-        }
-
-        .main-logo {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-        }
-
-        .container {
-            padding: 15px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        h2 {
-            margin: 0 0 15px 0;
-            color: var(--dochas-blue);
-            font-size: 1rem;
-            text-transform: uppercase;
-        }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        button {
-            border: none;
-            border-radius: 12px;
-            padding: 15px 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.1s;
-        }
-
-        .btn-easy { background: #d4edda; color: #155724; }
-        .btn-tight { background: #fff3cd; color: #856404; }
-        .btn-heavy { background: #f8d7da; color: #721c24; grid-column: span 2; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 0; color: var(--text-main); overflow: hidden; height: 100vh; }
         
-        /* Walk Buttons */
-        .btn-walk { background: var(--dochas-light); color: var(--dochas-blue); border: 1px solid var(--dochas-blue); }
+        #main-content { padding: 10px; width: 100%; max-width: 500px; margin: 0 auto; transition: filter 0.8s ease; height: 100%; overflow-y: auto; }
+        .blurred { filter: blur(15px) brightness(0.9); pointer-events: none; }
 
-        button:active { opacity: 0.7; transform: scale(0.98); }
+        h1 { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 15px 0 10px 5px; letter-spacing: -1px; }
 
-        .log-entry {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 4px solid var(--dochas-blue);
-            font-size: 0.9rem;
+        /* Neumorphic Buttons */
+        .nav-btn {
+            padding: 12px; border-radius: 12px; border: none;
+            background: var(--bg); box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+            font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; color: var(--text-main);
         }
 
-        .time { font-weight: bold; color: var(--dochas-blue); }
+        /* Main SpO2 Cards */
+        .spo2-card {
+            background: var(--bg); border-radius: 15px; margin-bottom: 12px;
+            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+            padding: 22px 15px 8px 15px; position: relative; width: 100%;
+        }
+
+        .corner-status {
+            position: absolute; top: 0; left: 0; height: 18px; display: flex; align-items: center; padding: 0 12px; 
+            border-radius: 12px 0 10px 0; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #fff;
+        }
+
+        /* Analysis Panel & Device Modals */
+        .side-panel {
+            position: fixed; top: 0; width: 100%; height: 100%;
+            z-index: 20000; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        /* Analysis slides from RIGHT, Devices from LEFT */
+        #analysisPanel { right: -100%; transform: translateX(0); }
+        #analysisPanel.open { transform: translateX(-100%); }
+        
+        .device-modal { left: -100%; transform: translateX(0); background: rgba(0,0,0,0.85); }
+        .device-modal.open { transform: translateX(100%); }
+
+        .pop-out {
+            background: var(--bg); width: 94%; height: 96vh;
+            border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            position: relative; overflow-y: auto; padding: 25px;
+        }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 20px; width: 35px; height: 35px;
+            background: #d63031; color: white; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: bold; cursor: pointer; z-index: 100;
+        }
+
+        /* Device Card specific styles from your code */
+        .brand-title { font-size: 34px; font-weight: 900; color: var(--text-main); margin: 0; padding-top: 10px; }
+        .model-subtitle { font-size: 16px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
+        .image-container {
+            width: 140px; height: 140px; margin: 0 auto 30px auto;
+            background: var(--bg); border-radius: 35px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 12px 12px 25px var(--shadow-dark), -12px -12px 25px var(--shadow-light); padding: 15px;
+        }
+        .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .description-box {
+            background: rgba(255, 255, 255, 0.4); border-radius: 20px; padding: 20px;
+            text-align: left; box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); margin-bottom: 30px;
+        }
+        .cert-footer { display: flex; justify-content: space-between; padding-top: 20px; border-top: 2px solid rgba(0,0,0,0.08); }
+        .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .cert-unit img { height: 30px; margin-bottom: 5px; }
+        .cert-unit span { font-size: 8px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; text-align: center; }
+
+        /* Charting Section */
+        .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; overflow: hidden; }
+        canvas { width: 100%; height: 100%; }
+
+        /* Device Selection Buttons in Analysis */
+        .dev-btn { 
+            display: flex; align-items: center; gap: 15px; padding: 12px; 
+            background: rgba(255,255,255,0.4); border-radius: 15px; 
+            border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer;
+        }
+        .dev-btn img { width: 50px; height: 50px; object-fit: contain; background: white; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <div class="app-header">
-        <!-- Wide logo for the branding -->
-        <img src="https://github.com/duilsk/health-app/blob/main/logo.png?raw=true" alt="Dóchas Health" class="main-logo">
+<div id="main-content">
+    <h1>Oxygen (SpO2)</h1>
+    <div style="display: flex; gap:10px; margin-bottom:20px;">
+        <button class="nav-btn" onclick="openModal('oxyGuideModal')">Targets</button>
+        <button class="nav-btn" onclick="location.reload()">Sync</button>
     </div>
+    <div id="spo2-container"></div>
+</div>
 
-    <div class="container">
+<!-- ANALYSIS PANEL (RIGHT) -->
+<div id="analysisPanel" class="side-panel">
+    <div class="pop-out">
+        <div class="close-btn" onclick="closeAnalysis()">×</div>
+        <h2>Session Details</h2>
+        <div class="chart-frame" id="touch-zone">
+            <canvas id="c-oxy"></canvas>
+        </div>
+        <p style="font-size: 11px; opacity: 0.5; text-align: center;">DRAG TO SCAN DATA</p>
         
-        <!-- WALKING SECTION -->
-        <div class="card">
-            <h2>🚶 Daily Walk</h2>
-            <div class="btn-grid">
-                <button class="btn-walk" onclick="logItem('Walked 5 Mins ⏱️')">5 Mins</button>
-                <button class="btn-walk" onclick="logItem('Walked 10 Mins ⏱️')">10 Mins</button>
-                <button class="btn-walk" onclick="logItem('Walked 20 Mins ⏱️')">20 Mins</button>
-                <button class="btn-walk" onclick="logItem('Walked 30+ Mins ⏱️')">30+ Mins</button>
-            </div>
+        <h3 style="font-size: 13px; text-transform: uppercase; margin-top: 30px;">Devices Used</h3>
+        <div class="dev-btn" onclick="openDevice('omronModal')">
+            <img src="images/nightview.png" alt="NightView">
+            <div><strong style="display:block;">Omron NightView</strong><span style="font-size:10px; opacity:0.6;">Wrist BP Monitor</span></div>
         </div>
-
-        <!-- BREATHING SECTION -->
-        <div class="card">
-            <h2>🫁 Breathing Check</h2>
-            <div class="btn-grid">
-                <button class="btn-easy" onclick="logItem('Breathing: Clear')">Clear</button>
-                <button class="btn-tight" onclick="logItem('Breathing: Tight')">Tight</button>
-                <button class="btn-heavy" onclick="logItem('Breathing: Heavy Shortness')">Short of Breath</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>📋 Activity History</h2>
-            <div id="history">
-                <p style="color: #999; text-align: center;">Your logs will appear here.</p>
-            </div>
-            <button onclick="clearLogs()" style="background: none; color: #ccc; font-size: 0.7rem; margin-top: 10px; width: 100%;">Clear History</button>
+        <div class="dev-btn" onclick="openDevice('wellueModal')">
+            <img src="images/o2ring.png" alt="O2Ring">
+            <div><strong style="display:block;">Wellue O2Ring S</strong><span style="font-size:10px; opacity:0.6;">Pulse Oximeter</span></div>
         </div>
     </div>
+</div>
 
-    <script>
-        window.onload = function() {
-            const data = localStorage.getItem('dochasLogs');
-            if (data) document.getElementById('history').innerHTML = data;
-        };
+<!-- OMRON DEVICE MODAL (LEFT) -->
+<div id="omronModal" class="side-panel device-modal" onclick="closeOnOuterClick(event)">
+    <div class="pop-out device-card">
+        <div class="close-btn" onclick="closeDevice('omronModal')">&times;</div>
+        <h1 class="brand-title">Omron</h1>
+        <div class="model-subtitle">NightView</div>
+        <div class="image-container"><img src="images/nightview.png"></div>
+        <div class="description-box"><p>Clinically validated, silent, wrist-worn blood pressure monitor specifically designed for nocturnal use. Enables automatic tracking without disturbing sleep.</p></div>
+        <div class="cert-footer">
+            <div class="cert-unit"><img src="images/esh.png"><span>ESH</span></div>
+            <div class="cert-unit"><img src="images/ce-mark.png"><span>MDD IIa</span></div>
+            <div class="cert-unit"><img src="images/iso.png"><span>ISO</span></div>
+            <div class="cert-unit"><img src="images/bihs.png"><span>BIHS</span></div>
+        </div>
+    </div>
+</div>
 
-        function logItem(text) {
-            const history = document.getElementById('history');
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const entry = `<div class="log-entry"><span class="time">${time}</span> ${text}</div>`;
-            
-            if (history.innerHTML.includes('Your logs')) history.innerHTML = '';
-            
-            history.innerHTML = entry + history.innerHTML;
-            localStorage.setItem('dochasLogs', history.innerHTML);
+<!-- WELLUE DEVICE MODAL (LEFT) -->
+<div id="wellueModal" class="side-panel device-modal" onclick="closeOnOuterClick(event)">
+    <div class="pop-out device-card">
+        <div class="close-btn" onclick="closeDevice('wellueModal')">&times;</div>
+        <h1 class="brand-title">Wellue</h1>
+        <div class="model-subtitle">O2Ring S</div>
+        <div class="image-container"><img src="images/o2ring.png"></div>
+        <div class="description-box"><p>Medical-grade wearable oximeter for continuous monitoring of SpO2 and pulse rate. Features patented ring sensor and haptic vibration alerts.</p></div>
+        <div class="cert-footer">
+            <div class="cert-unit"><img src="images/ce-mark.png"><span>CE Medical</span></div>
+            <div class="cert-unit"><img src="images/fda-logo.png"><span>FDA Cleared</span></div>
+            <div class="cert-unit"><img src="images/fcc-logo.png"><span>FCC Cert</span></div>
+            <div class="cert-unit"><img src="images/bluetooth.png"><span>Bluetooth</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Data Prep
+    const rawData = [
+        {level: 99, hr: 60, date: '16 Jan', time: '10:45 AM', type: 'Spot'},
+        {level: 89, hr: 74, date: '15 Jan', time: '03:10 AM', type: 'Night'}
+    ];
+
+    // 2. Main Render
+    function render() {
+        const container = document.getElementById('spo2-container');
+        rawData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'spo2-card';
+            card.innerHTML = `
+                <div class="corner-status" style="background: ${item.level > 94 ? 'var(--c-optimal)' : 'var(--c-low)'}">
+                    ${item.level > 94 ? 'Optimal' : 'Below Target'}
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:20px; font-weight:900;">${item.hr} <small>BPM</small></div>
+                    <div style="font-size:40px; font-weight:900;">${item.level}%</div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <span style="font-size:10px; opacity:0.6;">${item.date} ${item.time}</span>
+                    ${item.type === 'Night' ? `<span style="color:var(--accent); font-weight:900; font-size:11px; cursor:pointer;" onclick="openAnalysis()">ANALYSIS ></span>` : ''}
+                </div>`;
+            container.appendChild(card);
+        });
+    }
+
+    // 3. Panel Controls
+    function openAnalysis() {
+        document.getElementById('main-content').classList.add('blurred');
+        document.getElementById('analysisPanel').classList.add('open');
+    }
+    
+    function closeAnalysis() {
+        document.getElementById('main-content').classList.remove('blurred');
+        document.getElementById('analysisPanel').classList.remove('open');
+    }
+
+    function openDevice(id) {
+        document.getElementById(id).classList.add('open');
+    }
+
+    function closeDevice(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    function closeOnOuterClick(e) {
+        if (e.target.classList.contains('side-panel')) {
+            e.target.classList.remove('open');
         }
+    }
 
-        function clearLogs() {
-            if(confirm("Clear all logs?")) {
-                localStorage.removeItem('dochasLogs');
-                location.reload();
-            }
-        }
-    </script>
+    // Initialize
+    render();
+</script>
 </body>
 </html>
