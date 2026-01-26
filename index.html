@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dóchas Health | Clinical Suite</title>
+    <title>Dóchas Health | Master Suite</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* ==========================================================================
-           1. YOUR ORIGINAL SpO2 PAGE STYLES
+           1. YOUR ORIGINAL SpO2 PAGE STYLES (NO CHANGES)
            ========================================================================== */
         :root {
             --bg: #e0e5ec; 
@@ -18,8 +18,8 @@
             --c-low: #d35400;
             --c-hypoxic: #c0392b;
             --text-main: #2d3436;
-            --text-sub: #57606f; /* From your Device cards */
             --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
+            --text-sub: #57606f;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -79,15 +79,26 @@
         .analysis-link { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; cursor: pointer; }
 
         /* ==========================================================================
-           2. ANALYSIS PANEL (SLIDES FROM RIGHT)
+           2. NAVIGATION & MODAL HINGES (THE SYSTEM)
            ========================================================================== */
+        
+        /* Analysis Panel slides from RIGHT */
         #analysisPanel {
             position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
             background: transparent; z-index: 20000; 
-            transition: right 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; justify-content: center;
         }
         #analysisPanel.open { right: 0; }
+
+        /* Device Modals slide from LEFT */
+        .device-slide-drawer {
+            position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.9); z-index: 30000; 
+            transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .device-slide-drawer.open { left: 0; }
 
         .pop-out {
             background: var(--bg); width: 96%; margin: 2% auto;
@@ -98,43 +109,22 @@
         }
         .scroll-content { overflow-y: auto; padding: 25px; flex: 1; }
 
-        /* ==========================================================================
-           3. DEVICE MODAL STYLES (SLIDES FROM LEFT)
-           ========================================================================== */
-        .device-modal-overlay {
-            position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
-            background: rgba(18, 18, 18, 0.9); z-index: 30000; 
-            transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .device-modal-overlay.open { left: 0; }
-
-        /* YOUR ORIGINAL DEVICE CARD STYLING */
+        /* YOUR DEVICE CARD CSS */
         .device-card {
-            background: var(--bg); width: 92%; max-width: 480px;
-            border-radius: 50px; padding: 25px 40px 45px 40px;
+            background: var(--bg); width: 92%; max-width: 480px; border-radius: 50px;
+            padding: 25px 40px 45px 40px; text-align: center; box-sizing: border-box; position: relative;
             box-shadow: 30px 30px 60px rgba(0,0,0,0.8);
-            text-align: center; box-sizing: border-box; position: relative;
         }
-
-        .close-btn {
-            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
-            background: #d63031; color: white; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; font-weight: bold; box-shadow: 4px 4px 10px rgba(0,0,0,0.3); cursor: pointer;
-        }
-
         .brand-title { font-size: 34px; font-weight: 900; color: var(--text-main); margin: 0; padding-top: 10px; }
         .model-subtitle { font-size: 16px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
         .image-container {
-            width: 160px; height: 160px; margin: 0 auto 30px auto;
-            background: var(--bg); border-radius: 35px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 12px 12px 25px var(--shadow-dark), -12px -12px 25px var(--shadow-light); padding: 20px;
+            width: 160px; height: 160px; margin: 0 auto 30px auto; background: var(--bg); border-radius: 35px;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+            box-shadow: 12px 12px 25px var(--shadow-dark), -12px -12px 25px var(--shadow-light);
         }
-        .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .description-box {
-            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px; text-align: left;
-            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px; text-align: left; margin-bottom: 40px;
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
         }
         .description-box p { font-size: 16px; line-height: 1.6; color: #2d3436; margin: 0; font-weight: 600; }
         .cert-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 2px solid rgba(0,0,0,0.08); }
@@ -142,64 +132,21 @@
         .cert-unit img { height: 35px; width: auto; margin-bottom: 10px; }
         .cert-unit span { font-size: 9px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; }
 
-        /* ==========================================================================
-           4. ANALYSIS CHART & OVERLAY STYLES
-           ========================================================================== */
+        .close-btn {
+            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
+            background: #d63031; color: white; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; font-size: 22px; font-weight: bold; cursor: pointer; z-index: 1000;
+        }
+
+        /* ANALYSIS CHART STYLES */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
         .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
         .tier { flex: 1; position: relative; }
         .tier-tag { position: absolute; top: 5px; left: 10px; font-size: 9px; font-weight: 900; opacity: 0.3; }
         #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
-        
-        /* Device List in Analysis Panel */
-        .device-container { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-bottom: 40px;}
-        .dev-selection-btn { display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255,255,255,0.6); border-radius: 10px; border: 1px solid #bbb; cursor: pointer;}
-        .dev-selection-btn img { width: 80px; height: 80px; border-radius: 5px; background: #fff; object-fit: contain; }
 
-        /* MODALS & OVERLAYS */
+        /* OVERLAYS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; padding: 25px; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 40000; display: none; padding: 20px; overflow-y: auto; }
-    </style>
-</head>
-<body>
-
-<!-- MAIN VIEW -->
-<div id="main-content">
-    <h1>Oxygen (SpO2)</h1>
-    <div class="top-nav">
-        <button class="nav-btn" onclick="openModal('oxyGuideModal')">Reference Chart</button>
-        <button class="nav-btn" onclick="location.reload()">Sync Data</button>
-    </div>
-    <div id="spo2-container"></div>
-</div>
-
-<!-- ANALYSIS PANEL (RIGHT) -->
-<div id="analysisPanel">
-    <div class="pop-out">
-        <div class="close-btn" style="top:15px; right:15px;" onclick="closeAnalysis()">×</div>
-        <div class="scroll-content">
-            <h2>Details</h2>
-            <div id="ana-date" class="date-sub" style="opacity:0.5; font-weight:800; font-size:12px; margin-bottom:15px;">15 Jan 2026, 02:17 - 08:00</div>
-
-            <div class="stats-grid">
-                <div class="stat-box"><span class="lbl" style="font-size:11px; font-weight:800; opacity:0.5;">Oxygen</span><br><span id="v-oxy" style="font-size:30px; font-weight:900; color:var(--oxy)">94%</span></div>
-                <div class="stat-box" style="text-align:right;"><span class="lbl" style="font-size:11px; font-weight:800; opacity:0.5;">Pulse</span><br><span id="v-hr" style="font-size:30px; font-weight:900; color:var(--hr)">57</span></div>
-            </div>
-
-            <div class="chart-frame" id="touch-zone">
-                <div id="hairline"></div>
-                <div class="tier"><span class="tier-tag">OXYGEN LEVEL</span><canvas id="c-oxy"></canvas></div>
-                <div class="tier"><span class="tier-tag">PULSE RATE</span><canvas id="c-hr"></canvas></div>
-                <div class="tier"><span class="tier-tag">MOTION</span><canvas id="c-move"></canvas></div>
-            </div>
-
-            <p style="text-align:center; font-size:12px; font-weight:800; opacity:0.5; margin-top:20px;">DEVICES USED</p>
-            <div class="device-container">
-                <div class="dev-selection-btn" onclick="openDevice('omronModal')">
-                    <img src="images/nightview.png">
-                    <div style="font-size:18px; font-weight:900;">Omron NightView</div>
-                </div>
-                <div class="dev-selection-btn" onclick="openDevice('wellueModal')">
-                    <img src="images/o2ring.png">
-                    <div style="font-size:18px; font-weight:900;">Wellue O2Ring S</div>
-                </div>
+        .alert-card { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; }
+        #protocolText { font-size: 19px; font-weight: 800; color: #000; line-height: 1.4; margin: 25px 0; text-align: left; border-left:
