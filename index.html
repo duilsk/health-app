@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dóchas Health | Master Suite</title>
+    <title>Dóchas Health | Clinical Suite</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* ==========================================================================
-           1. YOUR ORIGINAL SpO2 PAGE STYLES (NO CHANGES)
+           1. CORE VARIABLES & SETUP
            ========================================================================== */
         :root {
             --bg: #e0e5ec; 
@@ -18,8 +18,8 @@
             --c-low: #d35400;
             --c-hypoxic: #c0392b;
             --text-main: #2d3436;
-            --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
             --text-sub: #57606f;
+            --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -30,6 +30,9 @@
 
         h1 { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 5px 0 10px 5px; letter-spacing: -1px; }
 
+        /* ==========================================================================
+           2. NAVIGATION & SPO2 CARDS (YOUR ORIGINAL CODE)
+           ========================================================================== */
         .top-nav { display: flex; gap: 10px; margin-bottom: 15px; }
         .nav-btn {
             flex: 1; padding: 12px; border-radius: 12px; border: none;
@@ -79,27 +82,28 @@
         .analysis-link { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; cursor: pointer; }
 
         /* ==========================================================================
-           2. NAVIGATION & MODAL HINGES (THE SYSTEM)
+           3. SLIDING PANELS (THE MECHANISM)
            ========================================================================== */
         
-        /* Analysis Panel slides from RIGHT */
+        /* Analysis Panel - Slides from RIGHT */
         #analysisPanel {
             position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
             background: transparent; z-index: 20000; 
-            transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: right 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; justify-content: center;
         }
         #analysisPanel.open { right: 0; }
 
-        /* Device Modals slide from LEFT */
-        .device-slide-drawer {
+        /* Device Modals - Slide from LEFT */
+        .device-slide-modal {
             position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
-            background: rgba(18, 18, 18, 0.9); z-index: 30000; 
-            transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            background: rgba(0,0,0,0.85); z-index: 30000; 
+            transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; align-items: center; justify-content: center;
         }
-        .device-slide-drawer.open { left: 0; }
+        .device-slide-modal.open { left: 0; }
 
+        /* The container for content */
         .pop-out {
             background: var(--bg); width: 96%; margin: 2% auto;
             border-radius: 35px; box-sizing: border-box;
@@ -109,44 +113,6 @@
         }
         .scroll-content { overflow-y: auto; padding: 25px; flex: 1; }
 
-        /* YOUR DEVICE CARD CSS */
-        .device-card {
-            background: var(--bg); width: 92%; max-width: 480px; border-radius: 50px;
-            padding: 25px 40px 45px 40px; text-align: center; box-sizing: border-box; position: relative;
-            box-shadow: 30px 30px 60px rgba(0,0,0,0.8);
-        }
-        .brand-title { font-size: 34px; font-weight: 900; color: var(--text-main); margin: 0; padding-top: 10px; }
-        .model-subtitle { font-size: 16px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
-        .image-container {
-            width: 160px; height: 160px; margin: 0 auto 30px auto; background: var(--bg); border-radius: 35px;
-            display: flex; align-items: center; justify-content: center; padding: 20px;
-            box-shadow: 12px 12px 25px var(--shadow-dark), -12px -12px 25px var(--shadow-light);
-        }
-        .description-box {
-            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px; text-align: left; margin-bottom: 40px;
-            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
-        }
-        .description-box p { font-size: 16px; line-height: 1.6; color: #2d3436; margin: 0; font-weight: 600; }
-        .cert-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 2px solid rgba(0,0,0,0.08); }
-        .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .cert-unit img { height: 35px; width: auto; margin-bottom: 10px; }
-        .cert-unit span { font-size: 9px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; }
-
-        .close-btn {
-            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
-            background: #d63031; color: white; border-radius: 10px; display: flex;
-            align-items: center; justify-content: center; font-size: 22px; font-weight: bold; cursor: pointer; z-index: 1000;
-        }
-
-        /* ANALYSIS CHART STYLES */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
-        .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
-        .tier { flex: 1; position: relative; }
-        .tier-tag { position: absolute; top: 5px; left: 10px; font-size: 9px; font-weight: 900; opacity: 0.3; }
-        #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
-
-        /* OVERLAYS */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 40000; display: none; padding: 20px; overflow-y: auto; }
-        .alert-card { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; }
-        #protocolText { font-size: 19px; font-weight: 800; color: #000; line-height: 1.4; margin: 25px 0; text-align: left; border-left:
+        /* ==========================================================================
+           4. YOUR SPECIFIC DEVICE CARD CSS (COPIED EXACTLY)
+           ============================================
