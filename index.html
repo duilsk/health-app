@@ -108,24 +108,33 @@
     </div>
 
     <script>
-        function logHealth(message) {
-            const container = document.getElementById('logContainer');
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const newLog = document.createElement('div');
-            newLog.className = 'log-entry';
-            newLog.innerHTML = `<strong>${timeStr}</strong>: ${message}`;
-            
-            // Remove the "No logs yet" message
-            if (container.innerHTML.includes('No logs yet')) {
-                container.innerHTML = '';
-            }
-
-            // Add new log to the top
-            container.prepend(newLog);
+    // 1. When the page loads, look in the "Kitchen Journal" (LocalStorage)
+    window.onload = function() {
+        const savedLogs = localStorage.getItem('myHealthLogs');
+        if (savedLogs) {
+            document.getElementById('logContainer').innerHTML = savedLogs;
         }
-    </script>
+    };
+
+    function logHealth(message) {
+        const container = document.getElementById('logContainer');
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        const newLog = document.createElement('div');
+        newLog.className = 'log-entry';
+        newLog.innerHTML = `<strong>${timeStr}</strong>: ${message}`;
+        
+        if (container.innerHTML.includes('No logs yet')) {
+            container.innerHTML = '';
+        }
+
+        container.prepend(newLog);
+
+        // 2. Save the whole list to the "Kitchen Journal"
+        localStorage.setItem('myHealthLogs', container.innerHTML);
+    }
+</script>
 
 </body>
 </html>
