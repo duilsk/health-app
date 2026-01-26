@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vitals Core | SpO2 History & Analysis</title>
+    <title>Dóchas Health | Master Suite</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* -------------------------------------------------------------
-           PART 1: YOUR EXACT SpO2 PAGE CSS (UNCHANGED)
-           ------------------------------------------------------------- */
+        /* ==========================================================================
+           1. MAIN PAGE STYLES (FROM YOUR SpO2 CODE)
+           ========================================================================== */
         :root {
             --bg: #e0e5ec; 
             --shadow-dark: #b8c1d1;
@@ -36,272 +36,109 @@
             font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; color: var(--text-main);
         }
 
+        /* SpO2 CARD LOGIC */
         .spo2-card {
             background: var(--bg); border-radius: 15px; margin-bottom: 12px;
             box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
             padding: 22px 15px 8px 15px; position: relative; width: 100%; overflow: hidden;
         }
-
-        .corner-status {
-            position: absolute; top: 0; left: 0; height: 18px; display: flex; align-items: center; padding: 0 12px; 
-            border-radius: 12px 0 10px 0; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #fff; z-index: 10;
-        }
-
-        .lung-interact {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%);
-            z-index: 5; cursor: pointer; width: 85px; height: 85px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-            background: var(--bg);
-        }
-
+        .corner-status { position: absolute; top: 0; left: 0; height: 18px; display: flex; align-items: center; padding: 0 12px; border-radius: 12px 0 10px 0; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #fff; z-index: 10; }
+        .lung-interact { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%); z-index: 5; cursor: pointer; width: 85px; height: 85px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); background: var(--bg); }
         .lung-bg { font-size: 45px; color: #adb5bd; transition: 0.3s; }
 
+        /* ANIMATIONS */
         @keyframes pulseBelow { 0% { color: #e5989b; transform: scale(1); } 100% { color: #d35400; transform: scale(1.1); } }
         @keyframes pulseCritical { 0% { color: #ff4d4d; transform: scale(1); } 100% { color: #8b0000; transform: scale(1.15); } }
         .is-below { animation: pulseBelow 2s ease-in-out infinite alternate; }
         .is-critical { animation: pulseCritical 1.2s ease-in-out infinite alternate; }
+        @keyframes heartBeat { 0% { transform: scale(1); } 14% { transform: scale(1.3); } 28% { transform: scale(1); } 42% { transform: scale(1.15); } 70% { transform: scale(1); } }
 
         .data-grid { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; pointer-events: none; }
         .pulse-side { display: flex; flex-direction: column; align-items: center; width: 60px; padding-top: 12px; }
         .pulse-side i { color: #cc0000; font-size: 20px; margin-bottom: 2px; }
         .pulse-val { font-size: 26px; font-weight: 900; color: #444; line-height: 1; }
-        @keyframes heartBeat { 0% { transform: scale(1); } 14% { transform: scale(1.3); } 28% { transform: scale(1); } 42% { transform: scale(1.15); } 70% { transform: scale(1); } }
-
         .oxy-side { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; }
         .timestamp-box { font-size: 11px; font-weight: 900; color: #555; text-transform: uppercase; margin-bottom: 2px; }
         .oxy-val { font-size: 54px; font-weight: 900; line-height: 0.8; letter-spacing: -2px; }
-
         .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 5px; }
         .type-tag { font-size: 10px; font-weight: 900; opacity: 0.6; text-transform: uppercase; }
         .analysis-link { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; cursor: pointer; }
 
-        /* MODALS (Reference Chart & COPD) */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: none; padding: 20px; overflow-y: auto; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        .alert-card { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; }
-        #protocolText { font-size: 19px; font-weight: 800; color: #000; line-height: 1.4; margin: 25px 0; text-align: left; border-left: 6px solid #d35400; padding-left: 15px; }
-        .alert-btn { background: #2d3436; color: white; border: none; padding: 20px; border-radius: 12px; font-weight: 900; width: 100%; text-transform: uppercase; cursor: pointer; font-size: 15px; margin-top: 10px; }
-        .guide-card { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; color: white; display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 11px; text-transform: uppercase; }
-        .override-box { margin-top: 25px; padding: 15px; border-radius: 12px; background: var(--bg); box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); display: flex; justify-content: space-between; align-items: center; }
-        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--shadow-dark); transition: .4s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #d35400; }
-        input:checked + .slider:before { transform: translateX(22px); }
-
-        /* ANALYSIS PANEL */
+        /* ==========================================================================
+           2. ANALYSIS PANEL (SLIDES FROM RIGHT)
+           ========================================================================== */
         #analysisPanel {
             position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
             background: transparent; z-index: 20000; 
-            transition: right 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; justify-content: center;
         }
         #analysisPanel.open { right: 0; }
 
         .pop-out {
             background: var(--bg); width: 96%; margin: 2% auto;
-            border-radius: 35px; box-sizing: border-box;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
             position: relative; display: flex; flex-direction: column;
             max-height: 96vh; overflow: hidden;
         }
         .scroll-content { overflow-y: auto; padding: 25px; flex: 1; }
-        .close-btn {
-            position: absolute; top: 15px; right: 15px; width: 32px; height: 32px;
-            background: #e60000; color: white; display: flex; align-items: center; 
-            justify-content: center; border-radius: 8px; font-size: 18px; font-weight: bold; z-index: 10; cursor: pointer;
-        }
 
+        /* Chart Area Styles */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
-        .stat-box { display: flex; flex-direction: column; }
-        .lbl { font-size: 11px; font-weight: 800; opacity: 0.5; text-transform: uppercase; margin-bottom: 4px; }
-        .val { font-size: 30px; font-weight: 900; line-height: 1; min-height: 30px; }
-        #dynamic-row { grid-column: span 2; padding-top: 12px; margin-top: 5px; border-top: 2px solid rgba(0,0,0,0.05); min-height: 40px; display: flex; align-items: center; justify-content: center; }
-        #instruction-text { font-size: 14px; font-weight: 800; color: #444; text-align: center; }
-        #bp-display { width: 100%; display: none; justify-content: space-between; align-items: center; }
-        .bp-val { font-size: 26px; font-weight: 900; color: var(--bp); }
-
         .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
         .tier { flex: 1; position: relative; }
         .tier-tag { position: absolute; top: 5px; left: 10px; font-size: 9px; font-weight: 900; opacity: 0.3; }
-        canvas { width: 100%; height: 100%; display: block; }
         #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
 
-        .report-card { background: rgba(255,255,255,0.3); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 4px 4px 10px var(--shadow-dark); }
-        .data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .data-val { font-size: 16px; font-weight: 900; }
-        .meter-wrap { display: flex; align-items: center; gap: 10px; }
-        .meter-bar { width: 100px; height: 10px; border-radius: 5px; background: linear-gradient(to right, #cc0000, #ffcc00, #008080); position: relative; }
-        .meter-ptr { position: absolute; top: -4px; width: 3px; height: 18px; background: #000; border-radius: 2px; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 15px; }
-        th { text-align: left; opacity: 0.5; padding-bottom: 10px; font-weight: 800; text-transform: uppercase; font-size: 11px; }
-        td { padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.05); font-weight: 800; }
-
-        .notes-area { width: 100%; height: 100px; background: rgba(255,255,255,0.5); border-radius: 15px; border: 1px solid #bbb; padding: 12px; font-family: inherit; font-size: 16px; margin-top: 12px; outline: none; }
-
-        .device-container { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-bottom: 40px;}
-        .dev-btn { display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255,255,255,0.6); border-radius: 10px; border: 1px solid #bbb; cursor: pointer; }
-        .dev-btn img { width: 80px; height: 80px; border-radius: 5px; background: #fff; object-fit: contain; }
-        .dev-name { font-size: 18px; font-weight: 900; color: #1a1c20; }
-
-
-        /* -------------------------------------------------------------
-           PART 2: THE "DEVICE SLIDER" SYSTEM
-           I made this mimic the "body { background: #121212... }" 
-           from your device code so it looks EXACTLY as you designed.
-           ------------------------------------------------------------- */
-        .device-slider {
+        /* ==========================================================================
+           3. DEVICE SLIDE OVERLAY (SLIDES FROM LEFT)
+           ========================================================================== */
+        .device-drawer {
             position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
-            background: #121212; z-index: 30000; 
+            background: rgba(18, 18, 18, 0.95); z-index: 30000; 
             transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; align-items: center; justify-content: center;
         }
-        .device-slider.open { left: 0; }
+        .device-drawer.open { left: 0; }
 
-        /* -------------------------------------------------------------
-           PART 3: YOUR EXACT DEVICE CARD CSS (UNCHANGED)
-           I just renamed the CSS variables to have "dev-" in front 
-           so they don't break your main page.
-           ------------------------------------------------------------- */
-        :root {
-            --dev-bg: #e0e5ec;
-            --dev-shadow-dark: #b8c1d1;
-            --dev-shadow-light: #ffffff;
-            --dev-text-main: #1a1c20;
-            --dev-text-sub: #57606f;
-        }
-
+        /* YOUR ORIGINAL DEVICE CARD STYLES */
         .device-card {
-            background: var(--dev-bg);
-            width: 92%; max-width: 480px; border-radius: 50px;
-            padding: 25px 40px 45px 40px; box-shadow: 30px 30px 60px rgba(0,0,0,0.8);
-            text-align: center; box-sizing: border-box; position: relative;
+            background: var(--bg); width: 92%; max-width: 480px; border-radius: 50px;
+            padding: 25px 40px 45px 40px; text-align: center; box-sizing: border-box; position: relative;
+            box-shadow: 30px 30px 60px rgba(0,0,0,0.8);
         }
-
-        .dev-close-btn {
-            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
-            background: #d63031; color: white; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; font-weight: bold; box-shadow: 4px 4px 10px rgba(0,0,0,0.3); cursor: pointer;
+        .brand-title { font-size: 34px; font-weight: 900; color: #1a1c20; margin: 0; padding-top: 10px; }
+        .model-subtitle { font-size: 16px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
+        .image-container {
+            width: 160px; height: 160px; margin: 0 auto 30px auto; background: var(--bg); border-radius: 35px;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+            box-shadow: 12px 12px 25px var(--shadow-dark), -12px -12px 25px var(--shadow-light);
         }
-
-        .brand-title { font-size: 34px; font-weight: 900; color: var(--dev-text-main); margin: 0; padding-top: 10px; }
-        .model-subtitle { font-size: 16px; font-weight: 700; color: var(--dev-text-sub); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
-
-        .dev-image-container {
-            width: 160px; height: 160px; margin: 0 auto 30px auto; background: var(--dev-bg); border-radius: 35px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 12px 12px 25px var(--dev-shadow-dark), -12px -12px 25px var(--dev-shadow-light);
-            padding: 20px; box-sizing: border-box;
-        }
-        .dev-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
+        .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .description-box {
-            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px; text-align: left;
-            box-shadow: inset 5px 5px 10px var(--dev-shadow-dark), inset -5px -5px 10px var(--dev-shadow-light); margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px; text-align: left; margin-bottom: 40px;
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
         }
         .description-box p { font-size: 16px; line-height: 1.6; color: #2d3436; margin: 0; font-weight: 600; }
-
         .cert-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 2px solid rgba(0,0,0,0.08); }
         .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1; }
         .cert-unit img { height: 35px; width: auto; margin-bottom: 10px; }
-        .cert-unit span { font-size: 9px; font-weight: 900; color: var(--dev-text-sub); text-transform: uppercase; }
+        .cert-unit span { font-size: 9px; font-weight: 900; color: #57606f; text-transform: uppercase; }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
+            background: #d63031; color: white; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; font-size: 22px; font-weight: bold; cursor: pointer; z-index: 100;
+        }
+
+        /* OVERLAYS (PROTOCOLS) */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; padding: 25px; }
+        .alert-card { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 40000; display: none; padding: 20px; }
     </style>
 </head>
 <body>
 
-<!-- THE MAIN SpO2 PAGE (Your exact HTML) -->
+<!-- PAGE 1: SpO2 MAIN -->
 <div id="main-content">
-    <div class="viewport">
-        <h1>Oxygen (SpO2)</h1>
-        <div class="top-nav">
-            <button class="nav-btn" onclick="openModal('oxyGuideModal')">Reference Chart</button>
-            <button class="nav-btn" onclick="location.reload()">Sync Data</button>
-        </div>
-        <div id="spo2-container"></div>
-    </div>
-</div>
-
-<!-- MODALS & OVERLAYS (Your exact HTML) -->
-<div id="protocolOverlay" class="overlay">
-    <div class="alert-card">
-        <i class="fa-solid fa-lungs-virus" id="modalIcon" style="font-size: 50px; margin-bottom: 15px;"></i>
-        <h3 id="protocolTitle"></h3>
-        <p id="protocolText"></p>
-        <button class="alert-btn" onclick="closeOverlay('protocolOverlay')">I UNDERSTAND</button>
-    </div>
-</div>
-
-<div id="copdWarningOverlay" class="overlay">
-    <div class="alert-card">
-        <i class="fa-solid fa-hand-holding-medical" style="font-size: 50px; color: #d35400; margin-bottom: 20px;"></i>
-        <h3 style="font-weight: 900; text-transform: uppercase;">Clinical Warning</h3>
-        <p style="font-size: 18px; font-weight: 700; color: #000; line-height: 1.5; margin-bottom: 30px;">
-            Only activate if your Doctor prescribed a specific target of 88%–92%.
-        </p>
-        <button class="alert-btn" onclick="confirmCOPD()">CONFIRM & ACTIVATE</button>
-        <button class="alert-btn" style="background:#eee; color:#444;" onclick="cancelCOPD()">CANCEL</button>
-    </div>
-</div>
-
-<div id="oxyGuideModal" class="modal">
-    <div style="max-width:400px; margin:auto;">
-        <h2 style="font-weight: 900; text-transform: uppercase; text-align: center;">Clinical Targets</h2>
-        <div id="rangeList"></div>
-        <div class="override-box">
-            <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">COPD Directed Mode</span>
-            <label class="switch">
-                <input type="checkbox" id="copdToggle" onchange="handleToggleRequest(this)">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <button class="nav-btn" style="width: 100%; margin-top: 25px;" onclick="closeModal('oxyGuideModal')">BACK</button>
-    </div>
-</div>
-
-<!-- ANALYSIS PANEL (Your exact HTML + click actions added to buttons) -->
-<div id="analysisPanel">
-    <div class="pop-out">
-        <div class="close-btn" onclick="closeAnalysis()">×</div>
-        <div class="scroll-content">
-            <h2>Details</h2>
-            <div id="ana-date" class="date-sub">15 Jan 2026, 02:17 - 08:00</div>
-
-            <div class="stats-grid">
-                <div class="stat-box"><span class="lbl">Oxygen</span><span class="val" id="v-oxy" style="color:var(--oxy)">94%</span></div>
-                <div class="stat-box" style="text-align:right;"><span class="lbl">Time</span><span class="val" id="v-time" style="font-size:20px;">02:17</span></div>
-                <div class="stat-box"><span class="lbl">Pulse Rate</span><span class="val" id="v-hr" style="color:var(--hr)">57</span></div>
-                <div class="stat-box" style="text-align:right;"><span class="lbl">Motion</span><span class="val" id="v-move" style="font-size:20px;"></span></div>
-                <div id="dynamic-row">
-                    <div id="instruction-text">DRAG FINGER ACROSS GRAPH TO VIEW STATS</div>
-                    <div id="bp-display">
-                        <span class="lbl" style="color:var(--bp); opacity: 1; margin-bottom:0;">NIGHTVIEW BP</span>
-                        <span class="bp-val" id="v-bp">122/81</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chart-frame" id="touch-zone">
-                <div id="hairline"></div>
-                <div class="tier"><span class="tier-tag">OXYGEN LEVEL</span><canvas id="c-oxy"></canvas></div>
-                <div class="tier"><span class="tier-tag">PULSE RATE</span><canvas id="c-hr"></canvas></div>
-                <div class="tier"><span class="tier-tag">MOTION</span><canvas id="c-move"></canvas></div>
-            </div>
-
-            <div class="report-card">
-                <div class="data-row"><span class="data-lbl">O2 Score</span><div class="meter-wrap"><span class="data-val">7.0</span><div class="meter-bar"><div class="meter-ptr" style="left: 70%;"></div></div></div></div>
-                <div class="data-row"><span class="data-lbl">Drops over 4%</span><span class="data-val">104</span></div>
-                <div class="data-row"><span class="data-lbl">Drops per hour</span><span class="data-val">18.19</span></div>
-                <div class="data-row"><span class="data-lbl">Oxygen Range</span><span class="data-val">84-99%</span></div>
-            </div>
-
-            <div class="report-card">
-                <span class="lbl" style="font-size: 13px;">Oxygen Distribution</span>
-                <table><tr><th>Range</th><th>Duration</th><th>%</th></tr><tr><td>95-100%</td><td>2h 24m 58s</td><td>42.27%</td></tr><tr><td>90-94%</td><td>3h 5m 53s</td><td>54.20%</td></tr><tr><td>&lt;90%</td><td>12m 7s</td><td>3.53%</td></tr></table>
-            </div>
-
-            <div class="report-card"><span class="lbl" style="font-size: 13px;">Ad
+    <h1>O
