@@ -1,15 +1,16 @@
 {
-  "name": "Health Tracker PWA",
-  "short_name": "HealthApp",
+  "name": "Dóchas Health",
+  "short_name": "Dóchas",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#f4f7f6",
-  "theme_color": "#2c3e50",
+  "background_color": "#ffffff",
+  "theme_color": "#2171b5",
   "icons": [
     {
-      "src": "https://github.com/duilsk/health-app/blob/main/logo.png?raw=true",
+      "src": "https://github.com/duilsk/health-app/blob/main/app_logo.png?raw=true",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
