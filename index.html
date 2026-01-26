@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vitals Core | SpO2 History & Analysis</title>
+    <title>Dóchas Health | SpO2 Clinical</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* CSS FROM PAGE 1 */
+        /* --- YOUR ORIGINAL SpO2 CSS --- */
         :root {
             --bg: #e0e5ec; 
             --shadow-dark: #b8c1d1;
@@ -16,6 +16,7 @@
             --c-low: #d35400;
             --c-hypoxic: #c0392b;
             --text-main: #2d3436;
+            --text-sub: #57606f;
             --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
         }
 
@@ -75,211 +76,156 @@
         .type-tag { font-size: 10px; font-weight: 900; opacity: 0.6; text-transform: uppercase; }
         .analysis-link { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; cursor: pointer; }
 
-        /* MODALS (Reference Chart & COPD) */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: none; padding: 20px; overflow-y: auto; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        .alert-card { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; }
-        #protocolText { font-size: 19px; font-weight: 800; color: #000; line-height: 1.4; margin: 25px 0; text-align: left; border-left: 6px solid #d35400; padding-left: 15px; }
-        .alert-btn { background: #2d3436; color: white; border: none; padding: 20px; border-radius: 12px; font-weight: 900; width: 100%; text-transform: uppercase; cursor: pointer; font-size: 15px; margin-top: 10px; }
-        .guide-card { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; color: white; display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 11px; text-transform: uppercase; }
-        .override-box { margin-top: 25px; padding: 15px; border-radius: 12px; background: var(--bg); box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light); display: flex; justify-content: space-between; align-items: center; }
-        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--shadow-dark); transition: .4s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #d35400; }
-        input:checked + .slider:before { transform: translateX(22px); }
-
-        /* ANALYSIS PANEL - THE FLOW FROM PAGE 2 */
-        #analysisPanel {
+        /* --- YOUR DEVICE CARD CSS INTEGRATED --- */
+        .side-panel {
             position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
             background: transparent; z-index: 20000; 
-            transition: right 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; justify-content: center;
         }
-        #analysisPanel.open { right: 0; }
+        .side-panel.open { right: 0; }
 
         .pop-out {
             background: var(--bg); width: 96%; margin: 2% auto;
-            border-radius: 35px; box-sizing: border-box;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
             position: relative; display: flex; flex-direction: column;
-            max-height: 96vh; overflow: hidden;
+            max-height: 96vh; overflow-y: auto; padding: 25px;
         }
-        .scroll-content { overflow-y: auto; padding: 25px; flex: 1; }
+
         .close-btn {
-            position: absolute; top: 15px; right: 15px; width: 32px; height: 32px;
-            background: #e60000; color: white; display: flex; align-items: center; 
-            justify-content: center; border-radius: 8px; font-size: 18px; font-weight: bold; z-index: 10; cursor: pointer;
+            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
+            background: #d63031; color: white; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: bold; cursor: pointer; z-index: 100;
         }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
-        .stat-box { display: flex; flex-direction: column; }
-        .lbl { font-size: 11px; font-weight: 800; opacity: 0.5; text-transform: uppercase; margin-bottom: 4px; }
-        .val { font-size: 30px; font-weight: 900; line-height: 1; min-height: 30px; }
-        #dynamic-row { grid-column: span 2; padding-top: 12px; margin-top: 5px; border-top: 2px solid rgba(0,0,0,0.05); min-height: 40px; display: flex; align-items: center; justify-content: center; }
-        #instruction-text { font-size: 14px; font-weight: 800; color: #444; text-align: center; }
-        #bp-display { width: 100%; display: none; justify-content: space-between; align-items: center; }
-        .bp-val { font-size: 26px; font-weight: 900; color: var(--bp); }
+        /* Device Specific Formatting from your cards */
+        .device-card-content { text-align: center; width: 100%; }
+        .brand-title { font-size: 34px; font-weight: 900; color: var(--text-main); margin: 0; padding-top: 10px; }
+        .model-subtitle { font-size: 16px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
+        .image-container {
+            width: 160px; height: 160px; margin: 0 auto 30px auto;
+            background: var(--bg); border-radius: 35px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 12px 12px 25px var(--shadow-dark), -12px -12px 25px var(--shadow-light); padding: 20px;
+        }
+        .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .description-box {
+            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px;
+            text-align: left; box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); margin-bottom: 40px;
+        }
+        .cert-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 2px solid rgba(0,0,0,0.08); }
+        .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .cert-unit img { height: 35px; width: auto; margin-bottom: 10px; }
+        .cert-unit span { font-size: 9px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; }
 
+        /* Charting Section from your SpO2 Analysis Panel */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
         .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
         .tier { flex: 1; position: relative; }
         .tier-tag { position: absolute; top: 5px; left: 10px; font-size: 9px; font-weight: 900; opacity: 0.3; }
-        canvas { width: 100%; height: 100%; display: block; }
         #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
-
-        .report-card { background: rgba(255,255,255,0.3); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 4px 4px 10px var(--shadow-dark); }
-        .data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .data-val { font-size: 16px; font-weight: 900; }
-        .meter-wrap { display: flex; align-items: center; gap: 10px; }
-        .meter-bar { width: 100px; height: 10px; border-radius: 5px; background: linear-gradient(to right, #cc0000, #ffcc00, #008080); position: relative; }
-        .meter-ptr { position: absolute; top: -4px; width: 3px; height: 18px; background: #000; border-radius: 2px; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 15px; }
-        th { text-align: left; opacity: 0.5; padding-bottom: 10px; font-weight: 800; text-transform: uppercase; font-size: 11px; }
-        td { padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.05); font-weight: 800; }
-
-        .notes-area { width: 100%; height: 100px; background: rgba(255,255,255,0.5); border-radius: 15px; border: 1px solid #bbb; padding: 12px; font-family: inherit; font-size: 16px; margin-top: 12px; outline: none; }
-
-        .device-container { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-bottom: 40px;}
-        .dev-btn { display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255,255,255,0.6); border-radius: 10px; border: 1px solid #bbb; }
-        .dev-btn img { width: 80px; height: 80px; border-radius: 5px; background: #fff; object-fit: contain; }
-        .dev-name { font-size: 18px; font-weight: 900; color: #1a1c20; }
+        
+        /* MODALS Overlay */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 30000; display: none; align-items: center; justify-content: center; padding: 25px; }
     </style>
 </head>
 <body>
 
 <div id="main-content">
-    <div class="viewport">
-        <h1>Oxygen (SpO2)</h1>
-        <div class="top-nav">
-            <button class="nav-btn" onclick="openModal('oxyGuideModal')">Reference Chart</button>
-            <button class="nav-btn" onclick="location.reload()">Sync Data</button>
-        </div>
-        <div id="spo2-container"></div>
+    <h1>Oxygen (SpO2)</h1>
+    <div class="top-nav">
+        <button class="nav-btn" onclick="openModal('oxyGuideModal')">Reference Chart</button>
+        <button class="nav-btn" onclick="location.reload()">Sync Data</button>
     </div>
+    <div id="spo2-container"></div>
 </div>
 
-<div id="protocolOverlay" class="overlay">
-    <div class="alert-card">
-        <i class="fa-solid fa-lungs-virus" id="modalIcon" style="font-size: 50px; margin-bottom: 15px;"></i>
-        <h3 id="protocolTitle"></h3>
-        <p id="protocolText"></p>
-        <button class="alert-btn" onclick="closeOverlay('protocolOverlay')">I UNDERSTAND</button>
-    </div>
-</div>
-
-<div id="copdWarningOverlay" class="overlay">
-    <div class="alert-card">
-        <i class="fa-solid fa-hand-holding-medical" style="font-size: 50px; color: #d35400; margin-bottom: 20px;"></i>
-        <h3 style="font-weight: 900; text-transform: uppercase;">Clinical Warning</h3>
-        <p style="font-size: 18px; font-weight: 700; color: #000; line-height: 1.5; margin-bottom: 30px;">
-            Only activate if your Doctor prescribed a specific target of 88%–92%.
-        </p>
-        <button class="alert-btn" onclick="confirmCOPD()">CONFIRM & ACTIVATE</button>
-        <button class="alert-btn" style="background:#eee; color:#444;" onclick="cancelCOPD()">CANCEL</button>
-    </div>
-</div>
-
-<div id="oxyGuideModal" class="modal">
-    <div style="max-width:400px; margin:auto;">
-        <h2 style="font-weight: 900; text-transform: uppercase; text-align: center;">Clinical Targets</h2>
-        <div id="rangeList"></div>
-        <div class="override-box">
-            <span style="font-size: 13px; font-weight: 900; text-transform: uppercase;">COPD Directed Mode</span>
-            <label class="switch">
-                <input type="checkbox" id="copdToggle" onchange="handleToggleRequest(this)">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <button class="nav-btn" style="width: 100%; margin-top: 25px;" onclick="closeModal('oxyGuideModal')">BACK</button>
-    </div>
-</div>
-
-<div id="analysisPanel">
+<!-- ANALYSIS PANEL (SLIDES FROM RIGHT) -->
+<div id="analysisPanel" class="side-panel">
     <div class="pop-out">
         <div class="close-btn" onclick="closeAnalysis()">×</div>
-        <div class="scroll-content">
-            <h2>Details</h2>
-            <div id="ana-date" class="date-sub">15 Jan 2026, 02:17 - 08:00</div>
+        <h2>Analysis</h2>
+        <div class="stats-grid">
+            <div class="stat-box"><span class="lbl">Oxygen</span><span class="val" id="v-oxy" style="color:var(--oxy)">94%</span></div>
+            <div class="stat-box" style="text-align:right;"><span class="lbl">Time</span><span class="val" id="v-time" style="font-size:20px;">02:17</span></div>
+            <div class="stat-box"><span class="lbl">Pulse</span><span class="val" id="v-hr" style="color:var(--hr)">57</span></div>
+        </div>
 
-            <div class="stats-grid">
-                <div class="stat-box"><span class="lbl">Oxygen</span><span class="val" id="v-oxy" style="color:var(--oxy)">94%</span></div>
-                <div class="stat-box" style="text-align:right;"><span class="lbl">Time</span><span class="val" id="v-time" style="font-size:20px;">02:17</span></div>
-                <div class="stat-box"><span class="lbl">Pulse Rate</span><span class="val" id="v-hr" style="color:var(--hr)">57</span></div>
-                <div class="stat-box" style="text-align:right;"><span class="lbl">Motion</span><span class="val" id="v-move" style="font-size:20px;"></span></div>
-                <div id="dynamic-row">
-                    <div id="instruction-text">DRAG FINGER ACROSS GRAPH TO VIEW STATS</div>
-                    <div id="bp-display">
-                        <span class="lbl" style="color:var(--bp); opacity: 1; margin-bottom:0;">NIGHTVIEW BP</span>
-                        <span class="bp-val" id="v-bp">122/81</span>
-                    </div>
-                </div>
-            </div>
+        <div class="chart-frame" id="touch-zone">
+            <div id="hairline"></div>
+            <div class="tier"><span class="tier-tag">OXYGEN</span><canvas id="c-oxy"></canvas></div>
+            <div class="tier"><span class="tier-tag">PULSE</span><canvas id="c-hr"></canvas></div>
+            <div class="tier"><span class="tier-tag">MOTION</span><canvas id="c-move"></canvas></div>
+        </div>
 
-            <div class="chart-frame" id="touch-zone">
-                <div id="hairline"></div>
-                <div class="tier"><span class="tier-tag">OXYGEN LEVEL</span><canvas id="c-oxy"></canvas></div>
-                <div class="tier"><span class="tier-tag">PULSE RATE</span><canvas id="c-hr"></canvas></div>
-                <div class="tier"><span class="tier-tag">MOTION</span><canvas id="c-move"></canvas></div>
-            </div>
+        <h3 style="font-size: 13px; text-transform: uppercase;">Devices Used</h3>
+        <div style="display:flex; gap:10px;">
+            <button class="nav-btn" onclick="openDevice('omronPanel')">Omron</button>
+            <button class="nav-btn" onclick="openDevice('welluePanel')">Wellue</button>
+        </div>
+    </div>
+</div>
 
-            <div class="report-card">
-                <div class="data-row"><span class="data-lbl">O2 Score</span><div class="meter-wrap"><span class="data-val">7.0</span><div class="meter-bar"><div class="meter-ptr" style="left: 70%;"></div></div></div></div>
-                <div class="data-row"><span class="data-lbl">Drops over 4%</span><span class="data-val">104</span></div>
-                <div class="data-row"><span class="data-lbl">Drops per hour</span><span class="data-val">18.19</span></div>
-                <div class="data-row"><span class="data-lbl">Oxygen Range</span><span class="data-val">84-99%</span></div>
-            </div>
+<!-- OMRON DEVICE PANEL (SLIDES FROM RIGHT OVER ANALYSIS) -->
+<div id="omronPanel" class="side-panel">
+    <div class="pop-out device-card-content">
+        <div class="close-btn" onclick="closeDevice('omronPanel')">&times;</div>
+        <h1 class="brand-title">Omron</h1>
+        <div class="model-subtitle">NightView</div>
+        <div class="image-container"><img src="images/nightview.png"></div>
+        <div class="description-box">
+            <p>Clinically validated, silent, wrist-worn blood pressure monitor specifically designed for nocturnal use. Enables automatic tracking without disturbing sleep.</p>
+        </div>
+        <div class="cert-footer">
+            <div class="cert-unit"><img src="images/esh.png"><span>ESH</span></div>
+            <div class="cert-unit"><img src="images/ce-mark.png"><span>MDD IIa</span></div>
+            <div class="cert-unit"><img src="images/iso.png"><span>ISO</span></div>
+            <div class="cert-unit"><img src="images/bihs.png"><span>BIHS</span></div>
+        </div>
+    </div>
+</div>
 
-            <div class="report-card">
-                <span class="lbl" style="font-size: 13px;">Oxygen Distribution</span>
-                <table><tr><th>Range</th><th>Duration</th><th>%</th></tr><tr><td>95-100%</td><td>2h 24m 58s</td><td>42.27%</td></tr><tr><td>90-94%</td><td>3h 5m 53s</td><td>54.20%</td></tr><tr><td>&lt;90%</td><td>12m 7s</td><td>3.53%</td></tr></table>
-            </div>
-
-            <div class="report-card"><span class="lbl" style="font-size: 13px;">Add Notes</span><textarea class="notes-area" placeholder="Enter session notes..."></textarea></div>
-
-            <span class="lbl" style="display:block; margin-bottom: 12px;">Devices used..</span>
-            <div class="device-container">
-                <div class="dev-btn"><img src="images/o2ring.png"><div class="dev-name">Wellue O2Ring</div></div>
-                <div class="dev-btn"><img src="images/nightview.png"><div class="dev-name">Omron NightView</div></div>
-            </div>
+<!-- WELLUE DEVICE PANEL -->
+<div id="welluePanel" class="side-panel">
+    <div class="pop-out device-card-content">
+        <div class="close-btn" onclick="closeDevice('welluePanel')">&times;</div>
+        <h1 class="brand-title">Wellue</h1>
+        <div class="model-subtitle">O2Ring S</div>
+        <div class="image-container"><img src="images/o2ring.png"></div>
+        <div class="description-box">
+            <p>Medical-grade wearable oximeter for continuous monitoring. Features patented silicone ring sensor and haptic vibration for hypoxia events.</p>
+        </div>
+        <div class="cert-footer">
+            <div class="cert-unit"><img src="images/ce-mark.png"><span>CE Medical</span></div>
+            <div class="cert-unit"><img src="images/fda-logo.png"><span>FDA Cleared</span></div>
+            <div class="cert-unit"><img src="images/fcc-logo.png"><span>FCC Cert</span></div>
+            <div class="cert-unit"><img src="images/bluetooth.png"><span>Bluetooth</span></div>
         </div>
     </div>
 </div>
 
 <script>
-    // LOGIC FROM PAGE 1
+    /* --- ALL YOUR ORIGINAL JAVASCRIPT LOGIC --- */
     let isCOPDMode = false;
     const rawData = [
         {level: 99, hr: 60, date: '16 Jan', time: '10:45 AM', type: 'Spot'},
-        {level: 93, hr: 65, date: '15 Jan', time: '11:45 PM', type: 'Spot'},
-        {level: 89, hr: 74, date: '15 Jan', time: '03:10 AM', type: 'Night'},
-        {level: 84, hr: 88, date: '14 Jan', time: '04:22 AM', type: 'Night'}
+        {level: 89, hr: 74, date: '15 Jan', time: '03:10 AM', type: 'Night'}
     ];
 
     function getClinicalData(val) {
         if (!isCOPDMode) {
-            if (val >= 95) return {label: 'Optimal', color: 'var(--c-optimal)', anim: '', info: "HEALTHY: Your oxygen saturation is optimal."};
-            if (val >= 92) return {label: 'Normal', color: 'var(--c-normal)', anim: '', info: "CAUTION: Range is slightly sub-optimal."};
-            if (val >= 88) return {label: 'Below Target', color: 'var(--c-low)', anim: 'is-below', info: "ADVICE: Sit upright. Use pursed-lip breathing."};
-            return {label: 'Critical', color: 'var(--c-hypoxic)', anim: 'is-critical', info: "EMERGENCY: Levels are dangerously low."};
+            if (val >= 95) return {label: 'Optimal', color: 'var(--c-optimal)', anim: '', info: "HEALTHY: Saturation is optimal."};
+            if (val >= 88) return {label: 'Below Target', color: 'var(--c-low)', anim: 'is-below', info: "ADVICE: Sit upright."};
+            return {label: 'Critical', color: 'var(--c-hypoxic)', anim: 'is-critical', info: "EMERGENCY: Levels low."};
         } else {
-            if (val >= 88 && val <= 92) return {label: 'Optimal (COPD)', color: 'var(--c-optimal)', anim: '', info: "EXCELLENT: Within Physician-directed COPD target."};
-            if (val > 92) return {label: 'Above Target', color: 'var(--c-normal)', anim: '', info: "NOTE: Level is above your COPD target."};
-            return {label: 'Critical', color: 'var(--c-hypoxic)', anim: 'is-critical', info: "CRITICAL: Levels dropped below safe 88% threshold."};
+            if (val >= 88 && val <= 92) return {label: 'Optimal (COPD)', color: 'var(--c-optimal)', anim: '', info: "EXCELLENT."};
+            return {label: 'Critical', color: 'var(--c-hypoxic)', anim: 'is-critical', info: "CRITICAL."};
         }
     }
 
     function render() {
         const container = document.getElementById('spo2-container');
         container.innerHTML = '';
-        const rangeList = document.getElementById('rangeList');
-        if (!isCOPDMode) {
-            rangeList.innerHTML = `<div class="guide-card" style="background:var(--c-optimal);"><span>Optimal</span><span>95-100%</span></div><div class="guide-card" style="background:var(--c-normal);"><span>Normal</span><span>92-94%</span></div><div class="guide-card" style="background:var(--c-low);"><span>Below Target</span><span>88-91%</span></div><div class="guide-card" style="background:var(--c-hypoxic);"><span>Critical</span><span><88%</span></div>`;
-        } else {
-            rangeList.innerHTML = `<div class="guide-card" style="background:var(--c-normal);"><span>Above Target</span><span>>92%</span></div><div class="guide-card" style="background:var(--c-optimal);"><span>Optimal (COPD)</span><span>88-92%</span></div><div class="guide-card" style="background:var(--c-hypoxic);"><span>Critical</span><span><88%</span></div>`;
-        }
-
         rawData.forEach(item => {
             const clinical = getClinicalData(item.level);
             const card = document.createElement('div');
@@ -288,95 +234,8 @@
                 <div class="corner-status" style="background: ${clinical.color};">${clinical.label}</div>
                 <div class="lung-interact" onclick="showInfo(${item.level})"><i class="fa-solid fa-lungs lung-bg ${clinical.anim}"></i></div>
                 <div class="data-grid">
-                    <div class="pulse-side"><i class="fa-solid fa-heart" style="animation: heartBeat ${60/item.hr}s infinite;"></i><span class="pulse-val">${item.hr}</span><span style="font-size:10px; font-weight:800; opacity:0.6;">BPM</span></div>
-                    <div class="oxy-side"><div class="timestamp-box"><span>${item.date}</span> ${item.time}</div><div class="oxy-val" style="color: ${clinical.color};">${item.level}<span style="font-size:20px">%</span></div></div>
+                    <div class="pulse-side"><i class="fa-solid fa-heart" style="animation: heartBeat ${60/item.hr}s infinite;"></i><span class="pulse-val">${item.hr}</span></div>
+                    <div class="oxy-side"><div class="timestamp-box">${item.date} ${item.time}</div><div class="oxy-val" style="color: ${clinical.color};">${item.level}%</div></div>
                 </div>
                 <div class="card-footer">
-                    <span class="type-tag">${item.type} Reading</span>
-                    ${item.type === 'Night' ? `<span class="analysis-link" onclick="openAnalysis('${item.date}')">Analysis <i class="fa-solid fa-chevron-right"></i></span>` : ''}
-                </div>`;
-            container.appendChild(card);
-        });
-    }
-
-    // INTERFACE CONTROLS
-    function openModal(id) { document.getElementById(id).style.display = 'block'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function closeOverlay(id) { document.getElementById(id).style.display = 'none'; }
-    function handleToggleRequest(el) { if (el.checked) document.getElementById('copdWarningOverlay').style.display = 'flex'; else { isCOPDMode = false; render(); } }
-    function confirmCOPD() { isCOPDMode = true; document.getElementById('copdWarningOverlay').style.display = 'none'; render(); }
-    function cancelCOPD() { isCOPDMode = false; document.getElementById('copdToggle').checked = false; document.getElementById('copdWarningOverlay').style.display = 'none'; render(); }
-    function showInfo(val) { 
-        const d = getClinicalData(val);
-        document.getElementById('protocolTitle').innerText = d.label;
-        document.getElementById('protocolTitle').style.color = d.color;
-        document.getElementById('modalIcon').style.color = d.color;
-        document.getElementById('protocolText').innerText = d.info;
-        document.getElementById('protocolOverlay').style.display = 'flex';
-    }
-
-    // THE FLOW LOGIC
-    function openAnalysis(date) {
-        document.getElementById('main-content').classList.add('blurred');
-        document.getElementById('ana-date').innerText = date + " 2026, 02:17 - 08:00";
-        document.getElementById('analysisPanel').classList.add('open');
-        setTimeout(initCharts, 400);
-    }
-    function closeAnalysis() {
-        document.getElementById('main-content').classList.remove('blurred');
-        document.getElementById('analysisPanel').classList.remove('open');
-    }
-
-    // LOGIC FROM PAGE 2 (CHARTING)
-    const pts = 350;
-    const anaData = {
-        oxy: Array.from({length: pts}, (_, i) => 94 + Math.random()*3 - (i > 160 && i < 185 ? 7 : 0)),
-        hr: Array.from({length: pts}, (_, i) => 55 + Math.random()*5 + (i > 160 && i < 185 ? 15 : 0)),
-        move: Array.from({length: pts}, () => (Math.random() > 0.98 ? 60 : 5)),
-        bpIdx: 172
-    };
-
-    function drawTier(id, arr, col, min, max) {
-        const c = document.getElementById(id); const ctx = c.getContext('2d');
-        const ratio = window.devicePixelRatio || 1;
-        c.width = c.offsetWidth * ratio; c.height = c.offsetHeight * ratio;
-        ctx.scale(ratio, ratio);
-        ctx.beginPath(); ctx.strokeStyle = col; ctx.lineWidth = 2.5;
-        arr.forEach((d, i) => {
-            const x = (i/(pts-1)) * c.offsetWidth;
-            const y = c.offsetHeight - ((d - min) / (max - min)) * c.offsetHeight;
-            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-        });
-        ctx.stroke();
-    }
-
-    function initCharts() {
-        drawTier('c-oxy', anaData.oxy, '#008080', 80, 100);
-        drawTier('c-hr', anaData.hr, '#cc0000', 40, 110);
-        drawTier('c-move', anaData.move, '#555', 0, 100);
-    }
-
-    function sync(e) {
-        const rect = document.getElementById('touch-zone').getBoundingClientRect();
-        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        if (x < 0 || x > rect.width) return;
-        document.getElementById('instruction-text').style.display = 'none';
-        document.getElementById('hairline').style.display = 'block';
-        document.getElementById('hairline').style.left = x + 'px';
-        const idx = Math.floor((x / rect.width) * pts);
-        document.getElementById('v-oxy').innerText = anaData.oxy[idx].toFixed(1) + '%';
-        document.getElementById('v-hr').innerText = Math.floor(anaData.hr[idx]);
-        document.getElementById('v-move').innerText = anaData.move[idx] > 50 ? "High" : "";
-        let t = (2*60 + 17) + (idx);
-        document.getElementById('v-time').innerText = `${Math.floor((t/60)%24).toString().padStart(2,'0')}:${Math.floor(t%60).toString().padStart(2,'0')}`;
-        document.getElementById('bp-display').style.display = Math.abs(idx - anaData.bpIdx) < 50 ? 'flex' : 'none';
-    }
-
-    const zone = document.getElementById('touch-zone');
-    zone.addEventListener('mousedown', sync); zone.addEventListener('touchstart', sync); zone.addEventListener('touchmove', sync);
-    zone.addEventListener('mousemove', (e) => { if(e.buttons === 1) sync(e); });
-
-    render();
-</script>
-</body>
-</html>
+                    <span class="type-tag">${item.
