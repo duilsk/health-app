@@ -5,125 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dóchas Health</title>
     <link rel="manifest" href="manifest.json">
+    <!-- This is the Square Icon for Apple -->
     <link rel="apple-touch-icon" href="https://github.com/duilsk/health-app/blob/main/app_logo.png?raw=true">
     
     <style>
         :root {
             --dochas-blue: #2171b5;
-            --dochas-light-blue: #e3f2fd;
+            --dochas-light: #e3f2fd;
             --dochas-orange: #f39c12;
-            --text-dark: #2c3e50;
+            --text: #2c3e50;
         }
 
         body {
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto;
-            background-color: #f8f9fa;
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: #f0f4f8;
             margin: 0;
             padding: 0;
-            color: var(--text-dark);
+            color: var(--text);
         }
 
-        /* The Header Area */
         .app-header {
             background: white;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border-bottom: 4px solid var(--dochas-blue);
         }
 
         .main-logo {
             width: 100%;
-            max-width: 350px; /* Adjust this to make logo bigger/smaller */
+            max-width: 300px;
             height: auto;
         }
 
         .container {
-            padding: 20px;
+            padding: 15px;
             max-width: 500px;
             margin: 0 auto;
         }
 
         .card {
             background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         h2 {
-            margin-top: 0;
+            margin: 0 0 15px 0;
             color: var(--dochas-blue);
-            font-size: 1.1rem;
+            font-size: 1rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        /* The Buttons */
         .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         button {
             border: none;
             border-radius: 12px;
-            padding: 20px 10px;
+            padding: 15px 5px;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.1s;
         }
 
-        .btn-easy { background: #d4edda; color: #155724; border-bottom: 4px solid #c3e6cb; }
-        .btn-tight { background: #fff3cd; color: #856404; border-bottom: 4px solid #ffeeba; }
-        .btn-heavy { background: #f8d7da; color: #721c24; border-bottom: 4px solid #f5c6cb; grid-column: span 2; }
+        .btn-easy { background: #d4edda; color: #155724; }
+        .btn-tight { background: #fff3cd; color: #856404; }
+        .btn-heavy { background: #f8d7da; color: #721c24; grid-column: span 2; }
+        
+        /* Walk Buttons */
+        .btn-walk { background: var(--dochas-light); color: var(--dochas-blue); border: 1px solid var(--dochas-blue); }
 
-        button:active { transform: translateY(2px); border-bottom-width: 0; }
+        button:active { opacity: 0.7; transform: scale(0.98); }
 
-        /* The Log */
         .log-entry {
-            background: var(--dochas-light-blue);
-            padding: 12px;
+            background: #f8f9fa;
+            padding: 10px;
             border-radius: 8px;
             margin-bottom: 8px;
+            border-left: 4px solid var(--dochas-blue);
             font-size: 0.9rem;
-            border-left: 5px solid var(--dochas-blue);
         }
 
-        .timestamp { font-weight: bold; color: var(--dochas-blue); margin-right: 10px; }
+        .time { font-weight: bold; color: var(--dochas-blue); }
     </style>
 </head>
 <body>
 
     <div class="app-header">
-        <!-- Using your new logo image here -->
-        <img src="https://github.com/duilsk/health-app/blob/main/logo.png?raw=true" alt="Dóchas Health Logo" class="main-logo">
+        <!-- Wide logo for the branding -->
+        <img src="https://github.com/duilsk/health-app/blob/main/logo.png?raw=true" alt="Dóchas Health" class="main-logo">
     </div>
 
     <div class="container">
+        
+        <!-- WALKING SECTION -->
         <div class="card">
-            <h2>Breathing Check</h2>
+            <h2>🚶 Daily Walk</h2>
+            <div class="btn-grid">
+                <button class="btn-walk" onclick="logItem('Walked 5 Mins ⏱️')">5 Mins</button>
+                <button class="btn-walk" onclick="logItem('Walked 10 Mins ⏱️')">10 Mins</button>
+                <button class="btn-walk" onclick="logItem('Walked 20 Mins ⏱️')">20 Mins</button>
+                <button class="btn-walk" onclick="logItem('Walked 30+ Mins ⏱️')">30+ Mins</button>
+            </div>
+        </div>
+
+        <!-- BREATHING SECTION -->
+        <div class="card">
+            <h2>🫁 Breathing Check</h2>
             <div class="btn-grid">
                 <button class="btn-easy" onclick="logItem('Breathing: Clear')">Clear</button>
                 <button class="btn-tight" onclick="logItem('Breathing: Tight')">Tight</button>
-                <button class="btn-heavy" onclick="logItem('Breathing: Short of Breath')">Heavy Shortness</button>
+                <button class="btn-heavy" onclick="logItem('Breathing: Heavy Shortness')">Short of Breath</button>
             </div>
         </div>
 
         <div class="card">
-            <h2>Daily Activity</h2>
+            <h2>📋 Activity History</h2>
             <div id="history">
-                <p style="color: #999;">Nothing logged today.</p>
+                <p style="color: #999; text-align: center;">Your logs will appear here.</p>
             </div>
+            <button onclick="clearLogs()" style="background: none; color: #ccc; font-size: 0.7rem; margin-top: 10px; width: 100%;">Clear History</button>
         </div>
     </div>
 
     <script>
-        // Memory function
         window.onload = function() {
             const data = localStorage.getItem('dochasLogs');
             if (data) document.getElementById('history').innerHTML = data;
@@ -132,13 +144,19 @@
         function logItem(text) {
             const history = document.getElementById('history');
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const entry = `<div class="log-entry"><span class="time">${time}</span> ${text}</div>`;
             
-            const entry = `<div class="log-entry"><span class="timestamp">${time}</span> ${text}</div>`;
-            
-            if (history.innerHTML.includes('Nothing logged')) history.innerHTML = '';
+            if (history.innerHTML.includes('Your logs')) history.innerHTML = '';
             
             history.innerHTML = entry + history.innerHTML;
             localStorage.setItem('dochasLogs', history.innerHTML);
+        }
+
+        function clearLogs() {
+            if(confirm("Clear all logs?")) {
+                localStorage.removeItem('dochasLogs');
+                location.reload();
+            }
         }
     </script>
 </body>
