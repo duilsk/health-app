@@ -3,23 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dóchas Health | SpO2 Clinical</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* --- YOUR ORIGINAL SpO2 CSS --- */
-        :root {
-            --bg: #e0e5ec; 
-            --shadow-dark: #b8c1d1;
-            --shadow-light: #ffffff;<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dóchas Health | Clinical Suite</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* ==========================================================================
-           1. CORE SpO2 PAGE STYLES (FROM YOUR ORIGINAL CODE)
+           1. YOUR ORIGINAL SpO2 PAGE STYLES
            ========================================================================== */
         :root {
             --bg: #e0e5ec; 
@@ -30,8 +18,8 @@
             --c-low: #d35400;
             --c-hypoxic: #c0392b;
             --text-main: #2d3436;
-            --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
             --text-sub: #57606f; /* From your Device cards */
+            --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -71,7 +59,6 @@
 
         .lung-bg { font-size: 45px; color: #adb5bd; transition: 0.3s; }
 
-        /* LUNG ANIMATIONS */
         @keyframes pulseBelow { 0% { color: #e5989b; transform: scale(1); } 100% { color: #d35400; transform: scale(1.1); } }
         @keyframes pulseCritical { 0% { color: #ff4d4d; transform: scale(1); } 100% { color: #8b0000; transform: scale(1.15); } }
         .is-below { animation: pulseBelow 2s ease-in-out infinite alternate; }
@@ -92,10 +79,8 @@
         .analysis-link { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; cursor: pointer; }
 
         /* ==========================================================================
-           2. MODAL & ANALYSIS PANEL STYLES
+           2. ANALYSIS PANEL (SLIDES FROM RIGHT)
            ========================================================================== */
-        
-        /* THE ANALYSIS PANEL (RIGHT) */
         #analysisPanel {
             position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
             background: transparent; z-index: 20000; 
@@ -103,15 +88,6 @@
             display: flex; justify-content: center;
         }
         #analysisPanel.open { right: 0; }
-
-        /* THE DEVICE CARDS (LEFT) */
-        .device-slide-modal {
-            position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 30000; 
-            transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .device-slide-modal.open { left: 0; }
 
         .pop-out {
             background: var(--bg); width: 96%; margin: 2% auto;
@@ -121,17 +97,33 @@
             max-height: 96vh; overflow: hidden;
         }
         .scroll-content { overflow-y: auto; padding: 25px; flex: 1; }
-        
-        .close-btn {
-            position: absolute; top: 15px; right: 15px; width: 35px; height: 35px;
-            background: #d63031; color: white; display: flex; align-items: center; 
-            justify-content: center; border-radius: 10px; font-size: 22px; font-weight: bold; z-index: 100; cursor: pointer;
-        }
 
         /* ==========================================================================
-           3. DEVICE CARD SPECIFIC STYLES (FROM YOUR CARD CODE)
+           3. DEVICE MODAL STYLES (SLIDES FROM LEFT)
            ========================================================================== */
-        .device-card-inner { text-align: center; padding: 10px 20px; }
+        .device-modal-overlay {
+            position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.9); z-index: 30000; 
+            transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .device-modal-overlay.open { left: 0; }
+
+        /* YOUR ORIGINAL DEVICE CARD STYLING */
+        .device-card {
+            background: var(--bg); width: 92%; max-width: 480px;
+            border-radius: 50px; padding: 25px 40px 45px 40px;
+            box-shadow: 30px 30px 60px rgba(0,0,0,0.8);
+            text-align: center; box-sizing: border-box; position: relative;
+        }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
+            background: #d63031; color: white; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: bold; box-shadow: 4px 4px 10px rgba(0,0,0,0.3); cursor: pointer;
+        }
+
         .brand-title { font-size: 34px; font-weight: 900; color: var(--text-main); margin: 0; padding-top: 10px; }
         .model-subtitle { font-size: 16px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
         .image-container {
@@ -141,38 +133,37 @@
         }
         .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .description-box {
-            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px;
-            text-align: left; box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px; text-align: left;
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); margin-bottom: 40px;
         }
+        .description-box p { font-size: 16px; line-height: 1.6; color: #2d3436; margin: 0; font-weight: 600; }
         .cert-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 2px solid rgba(0,0,0,0.08); }
         .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1; }
         .cert-unit img { height: 35px; width: auto; margin-bottom: 10px; }
         .cert-unit span { font-size: 9px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; }
 
         /* ==========================================================================
-           4. ANALYSIS CHART STYLES (FROM YOUR CODE)
+           4. ANALYSIS CHART & OVERLAY STYLES
            ========================================================================== */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
         .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
         .tier { flex: 1; position: relative; }
         .tier-tag { position: absolute; top: 5px; left: 10px; font-size: 9px; font-weight: 900; opacity: 0.3; }
         #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
+        
+        /* Device List in Analysis Panel */
+        .device-container { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-bottom: 40px;}
+        .dev-selection-btn { display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255,255,255,0.6); border-radius: 10px; border: 1px solid #bbb; cursor: pointer;}
+        .dev-selection-btn img { width: 80px; height: 80px; border-radius: 5px; background: #fff; object-fit: contain; }
 
-        /* DEVICE SELECTION IN ANALYSIS PANEL */
-        .dev-selection-btn {
-            display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255,255,255,0.6); 
-            border-radius: 10px; border: 1px solid #bbb; margin-bottom: 10px; cursor: pointer;
-        }
-        .dev-selection-btn img { width: 60px; height: 60px; object-fit: contain; background: white; border-radius: 5px; }
-
-        /* OVERLAYS (COPD/Targets) */
+        /* MODALS & OVERLAYS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; padding: 25px; }
-        .alert-card { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 40000; display: none; padding: 20px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
+<!-- MAIN VIEW -->
 <div id="main-content">
     <h1>Oxygen (SpO2)</h1>
     <div class="top-nav">
@@ -182,15 +173,17 @@
     <div id="spo2-container"></div>
 </div>
 
-<!-- ANALYSIS PANEL (SLIDES FROM RIGHT) -->
+<!-- ANALYSIS PANEL (RIGHT) -->
 <div id="analysisPanel">
     <div class="pop-out">
-        <div class="close-btn" onclick="closeAnalysis()">×</div>
+        <div class="close-btn" style="top:15px; right:15px;" onclick="closeAnalysis()">×</div>
         <div class="scroll-content">
-            <h2>Session Analysis</h2>
+            <h2>Details</h2>
+            <div id="ana-date" class="date-sub" style="opacity:0.5; font-weight:800; font-size:12px; margin-bottom:15px;">15 Jan 2026, 02:17 - 08:00</div>
+
             <div class="stats-grid">
-                <div class="stat-box"><span class="lbl" style="font-size:11px; opacity:0.5; font-weight:800;">OXYGEN</span><br><span id="v-oxy" style="font-size:30px; font-weight:900; color:var(--oxy)">94%</span></div>
-                <div class="stat-box" style="text-align:right;"><span class="lbl" style="font-size:11px; opacity:0.5; font-weight:800;">TIME</span><br><span id="v-time" style="font-size:22px; font-weight:900;">02:17</span></div>
+                <div class="stat-box"><span class="lbl" style="font-size:11px; font-weight:800; opacity:0.5;">Oxygen</span><br><span id="v-oxy" style="font-size:30px; font-weight:900; color:var(--oxy)">94%</span></div>
+                <div class="stat-box" style="text-align:right;"><span class="lbl" style="font-size:11px; font-weight:800; opacity:0.5;">Pulse</span><br><span id="v-hr" style="font-size:30px; font-weight:900; color:var(--hr)">57</span></div>
             </div>
 
             <div class="chart-frame" id="touch-zone">
@@ -200,375 +193,13 @@
                 <div class="tier"><span class="tier-tag">MOTION</span><canvas id="c-move"></canvas></div>
             </div>
 
-            <p style="text-align:center; font-size:12px; font-weight:800; opacity:0.5;">DEVICES USED IN THIS SESSION</p>
-            <div class="dev-selection-btn" onclick="openDevice('omronModal')">
-                <img src="images/nightview.png">
-                <span style="font-weight:900;">Omron NightView</span>
-            </div>
-            <div class="dev-selection-btn" onclick="openDevice('wellueModal')">
-                <img src="images/o2ring.png">
-                <span style="font-weight:900;">Wellue O2Ring S</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- OMRON DEVICE MODAL (SLIDES FROM LEFT) -->
-<div id="omronModal" class="device-slide-modal" onclick="closeOnOuterClick(event, 'omronModal')">
-    <div class="pop-out device-card-inner">
-        <div class="close-btn" onclick="closeDevice('omronModal')">&times;</div>
-        <h1 class="brand-title">Omron</h1>
-        <div class="model-subtitle">NightView</div>
-        <div class="image-container"><img src="images/nightview.png"></div>
-        <div class="description-box">
-            <p>The Omron NightView is a clinically validated, silent, wrist-worn blood pressure monitor specifically designed for nocturnal use. It enables automatic readings throughout the night without disturbing sleep.</p>
-        </div>
-        <div class="cert-footer">
-            <div class="cert-unit"><img src="images/esh.png"><span>ESH Validated</span></div>
-            <div class="cert-unit"><img src="images/ce-mark.png"><span>MDD IIa</span></div>
-            <div class="cert-unit"><img src="images/iso.png"><span>ISO 81060-2</span></div>
-            <div class="cert-unit"><img src="images/bihs.png"><span>BIHS Validated</span></div>
-        </div>
-    </div>
-</div>
-
-<!-- WELLUE DEVICE MODAL (SLIDES FROM LEFT) -->
-<div id="wellueModal" class="device-slide-modal" onclick="closeOnOuterClick(event, 'wellueModal')">
-    <div class="pop-out device-card-inner">
-        <div class="close-btn" onclick="closeDevice('wellueModal')">&times;</div>
-        <h1 class="brand-title">Wellue</h1>
-        <div class="model-subtitle">O2Ring S</div>
-        <div class="image-container"><img src="images/o2ring.png"></div>
-        <div class="description-box">
-            <p>Medical-grade wearable oximeter for continuous monitoring of arterial blood oxygen saturation (SpO2) and pulse rate. Features a patented silicone ring sensor and haptic vibration alerts.</p>
-        </div>
-        <div class="cert-footer">
-            <div class="cert-unit"><img src="images/ce-mark.png"><span>CE Medical</span></div>
-            <div class="cert-unit"><img src="images/fda-logo.png"><span>FDA Cleared</span></div>
-            <div class="cert-unit"><img src="images/fcc-logo.png"><span>FCC Cert</span></div>
-            <div class="cert-unit"><img src="images/bluetooth.png"><span>Bluetooth</span></div>
-        </div>
-    </div>
-</div>
-
-<!-- OVERLAYS & MODALS -->
-<div id="protocolOverlay" class="overlay">
-    <div class="alert-card">
-        <i class="fa-solid fa-lungs-virus" id="modalIcon" style="font-size: 50px; margin-bottom: 15px;"></i>
-        <h3 id="protocolTitle"></h3>
-        <p id="protocolText" style="font-weight:700; text-align:left; border-left:5px solid #d35400; padding-left:10px;"></p>
-        <button class="nav-btn" style="width:100%; margin-top:20px; background:#2d3436; color:#fff;" onclick="closeOverlay('protocolOverlay')">I UNDERSTAND</button>
-    </div>
-</div>
-
-<div id="oxyGuideModal" class="modal">
-    <h2 style="text-align:center; font-weight:900;">CLINICAL TARGETS</h2>
-    <div id="rangeList"></div>
-    <button class="nav-btn" style="width: 100%; margin-top: 25px;" onclick="closeModal('oxyGuideModal')">BACK</button>
-</div>
-
-<script>
-    /* ==========================================================================
-       YOUR ORIGINAL LOGIC (SpO2 RENDER, CHARTING, SYNC)
-       ========================================================================== */
-    let isCOPDMode = false;
-    const rawData = [
-        {level: 99, hr: 60, date: '16 Jan', time: '10:45 AM', type: 'Spot'},
-        {level: 89, hr: 74, date: '15 Jan', time: '03:10 AM', type: 'Night'}
-    ];
-
-    function getClinicalData(val) {
-        if (val >= 95) return {label: 'Optimal', color: 'var(--c-optimal)', anim: '', info: "HEALTHY: Oxygen is optimal."};
-        if (val >= 88) return {label: 'Below Target', color: 'var(--c-low)', anim: 'is-below', info: "ADVICE: Sit upright. Use pursed-lip breathing."};
-        return {label: 'Critical', color: 'var(--c-hypoxic)', anim: 'is-critical', info: "EMERGENCY: Levels dangerously low."};
-    }
-
-    function render() {
-        const container = document.getElementById('spo2-container');
-        container.innerHTML = '';
-        rawData.forEach(item => {
-            const clinical = getClinicalData(item.level);
-            const card = document.createElement('div');
-            card.className = 'spo2-card';
-            card.innerHTML = `
-                <div class="corner-status" style="background: ${clinical.color};">${clinical.label}</div>
-                <div class="lung-interact" onclick="showInfo(${item.level})"><i class="fa-solid fa-lungs lung-bg ${clinical.anim}"></i></div>
-                <div class="data-grid">
-                    <div class="pulse-side"><i class="fa-solid fa-heart" style="animation: heartBeat ${60/item.hr}s infinite;"></i><span class="pulse-val">${item.hr}</span></div>
-                    <div class="oxy-side"><div class="timestamp-box">${item.date} ${item.time}</div><div class="oxy-val" style="color: ${clinical.color};">${item.level}<span style="font-size:20px">%</span></div></div>
+            <p style="text-align:center; font-size:12px; font-weight:800; opacity:0.5; margin-top:20px;">DEVICES USED</p>
+            <div class="device-container">
+                <div class="dev-selection-btn" onclick="openDevice('omronModal')">
+                    <img src="images/nightview.png">
+                    <div style="font-size:18px; font-weight:900;">Omron NightView</div>
                 </div>
-                <div class="card-footer">
-                    <span class="type-tag">${item.type} Reading</span>
-                    ${item.type === 'Night' ? `<span class="analysis-link" onclick="openAnalysis()">Analysis ></span>` : ''}
-                </div>`;
-            container.appendChild(card);
-        });
-    }
-
-    // INTERFACE CONTROLS
-    function openAnalysis() {
-        document.getElementById('main-content').classList.add('blurred');
-        document.getElementById('analysisPanel').classList.add('open');
-        setTimeout(initCharts, 400);
-    }
-    function closeAnalysis() {
-        document.getElementById('main-content').classList.remove('blurred');
-        document.getElementById('analysisPanel').classList.remove('open');
-    }
-    function openDevice(id) { document.getElementById(id).classList.add('open'); }
-    function closeDevice(id) { document.getElementById(id).classList.remove('open'); }
-    function closeOnOuterClick(e, id) { if(e.target.id === id) closeDevice(id); }
-
-    function openModal(id) { document.getElementById(id).style.display = 'block'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function closeOverlay(id) { document.getElementById(id).style.display = 'none'; }
-    function showInfo(val) { 
-        const d = getClinicalData(val);
-        document.getElementById('protocolTitle').innerText = d.label;
-        document.getElementById('protocolText').innerText = d.info;
-        document.getElementById('protocolOverlay').style.display = 'flex';
-    }
-
-    // CHARTING (SIMPLE DRAW)
-    function initCharts() {
-        const draw = (id, color) => {
-            const c = document.getElementById(id); const ctx = c.getContext('2d');
-            c.width = c.offsetWidth; c.height = c.offsetHeight;
-            ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2;
-            ctx.moveTo(0, 40); ctx.lineTo(c.width, 40); ctx.stroke();
-        }
-        draw('c-oxy', '#008080'); draw('c-hr', '#cc0000'); draw('c-move', '#555');
-    }
-
-    render();
-</script>
-</body>
-</html>
-            --c-optimal: #008080;
-            --c-normal: #2980b9;
-            --c-low: #d35400;
-            --c-hypoxic: #c0392b;
-            --text-main: #2d3436;
-            --text-sub: #57606f;
-            --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); font-family: 'Inter', sans-serif; margin: 0; padding: 0; color: var(--text-main); overflow: hidden; height: 100vh; }
-        
-        #main-content { padding: 10px; width: 100%; max-width: 500px; margin: 0 auto; transition: filter 0.8s ease; height: 100%; overflow-y: auto; }
-        .blurred { filter: blur(15px) brightness(0.9); pointer-events: none; }
-
-        h1 { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 5px 0 10px 5px; letter-spacing: -1px; }
-
-        .top-nav { display: flex; gap: 10px; margin-bottom: 15px; }
-        .nav-btn {
-            flex: 1; padding: 12px; border-radius: 12px; border: none;
-            background: var(--bg); box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
-            font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; color: var(--text-main);
-        }
-
-        .spo2-card {
-            background: var(--bg); border-radius: 15px; margin-bottom: 12px;
-            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-            padding: 22px 15px 8px 15px; position: relative; width: 100%; overflow: hidden;
-        }
-
-        .corner-status {
-            position: absolute; top: 0; left: 0; height: 18px; display: flex; align-items: center; padding: 0 12px; 
-            border-radius: 12px 0 10px 0; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #fff; z-index: 10;
-        }
-
-        .lung-interact {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%);
-            z-index: 5; cursor: pointer; width: 85px; height: 85px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-            background: var(--bg);
-        }
-
-        .lung-bg { font-size: 45px; color: #adb5bd; transition: 0.3s; }
-
-        @keyframes pulseBelow { 0% { color: #e5989b; transform: scale(1); } 100% { color: #d35400; transform: scale(1.1); } }
-        @keyframes pulseCritical { 0% { color: #ff4d4d; transform: scale(1); } 100% { color: #8b0000; transform: scale(1.15); } }
-        .is-below { animation: pulseBelow 2s ease-in-out infinite alternate; }
-        .is-critical { animation: pulseCritical 1.2s ease-in-out infinite alternate; }
-
-        .data-grid { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; pointer-events: none; }
-        .pulse-side { display: flex; flex-direction: column; align-items: center; width: 60px; padding-top: 12px; }
-        .pulse-side i { color: #cc0000; font-size: 20px; margin-bottom: 2px; }
-        .pulse-val { font-size: 26px; font-weight: 900; color: #444; line-height: 1; }
-        @keyframes heartBeat { 0% { transform: scale(1); } 14% { transform: scale(1.3); } 28% { transform: scale(1); } 42% { transform: scale(1.15); } 70% { transform: scale(1); } }
-
-        .oxy-side { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; }
-        .timestamp-box { font-size: 11px; font-weight: 900; color: #555; text-transform: uppercase; margin-bottom: 2px; }
-        .oxy-val { font-size: 54px; font-weight: 900; line-height: 0.8; letter-spacing: -2px; }
-
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 5px; }
-        .type-tag { font-size: 10px; font-weight: 900; opacity: 0.6; text-transform: uppercase; }
-        .analysis-link { font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase; cursor: pointer; }
-
-        /* --- YOUR DEVICE CARD CSS INTEGRATED --- */
-        .side-panel {
-            position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
-            background: transparent; z-index: 20000; 
-            transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; justify-content: center;
-        }
-        .side-panel.open { right: 0; }
-
-        .pop-out {
-            background: var(--bg); width: 96%; margin: 2% auto;
-            border-radius: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            position: relative; display: flex; flex-direction: column;
-            max-height: 96vh; overflow-y: auto; padding: 25px;
-        }
-
-        .close-btn {
-            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
-            background: #d63031; color: white; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; font-weight: bold; cursor: pointer; z-index: 100;
-        }
-
-        /* Device Specific Formatting from your cards */
-        .device-card-content { text-align: center; width: 100%; }
-        .brand-title { font-size: 34px; font-weight: 900; color: var(--text-main); margin: 0; padding-top: 10px; }
-        .model-subtitle { font-size: 16px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
-        .image-container {
-            width: 160px; height: 160px; margin: 0 auto 30px auto;
-            background: var(--bg); border-radius: 35px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 12px 12px 25px var(--shadow-dark), -12px -12px 25px var(--shadow-light); padding: 20px;
-        }
-        .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .description-box {
-            background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px;
-            text-align: left; box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); margin-bottom: 40px;
-        }
-        .cert-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 2px solid rgba(0,0,0,0.08); }
-        .cert-unit { display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .cert-unit img { height: 35px; width: auto; margin-bottom: 10px; }
-        .cert-unit span { font-size: 9px; font-weight: 900; color: var(--text-sub); text-transform: uppercase; }
-
-        /* Charting Section from your SpO2 Analysis Panel */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
-        .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
-        .tier { flex: 1; position: relative; }
-        .tier-tag { position: absolute; top: 5px; left: 10px; font-size: 9px; font-weight: 900; opacity: 0.3; }
-        #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
-        
-        /* MODALS Overlay */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 30000; display: none; align-items: center; justify-content: center; padding: 25px; }
-    </style>
-</head>
-<body>
-
-<div id="main-content">
-    <h1>Oxygen (SpO2)</h1>
-    <div class="top-nav">
-        <button class="nav-btn" onclick="openModal('oxyGuideModal')">Reference Chart</button>
-        <button class="nav-btn" onclick="location.reload()">Sync Data</button>
-    </div>
-    <div id="spo2-container"></div>
-</div>
-
-<!-- ANALYSIS PANEL (SLIDES FROM RIGHT) -->
-<div id="analysisPanel" class="side-panel">
-    <div class="pop-out">
-        <div class="close-btn" onclick="closeAnalysis()">×</div>
-        <h2>Analysis</h2>
-        <div class="stats-grid">
-            <div class="stat-box"><span class="lbl">Oxygen</span><span class="val" id="v-oxy" style="color:var(--oxy)">94%</span></div>
-            <div class="stat-box" style="text-align:right;"><span class="lbl">Time</span><span class="val" id="v-time" style="font-size:20px;">02:17</span></div>
-            <div class="stat-box"><span class="lbl">Pulse</span><span class="val" id="v-hr" style="color:var(--hr)">57</span></div>
-        </div>
-
-        <div class="chart-frame" id="touch-zone">
-            <div id="hairline"></div>
-            <div class="tier"><span class="tier-tag">OXYGEN</span><canvas id="c-oxy"></canvas></div>
-            <div class="tier"><span class="tier-tag">PULSE</span><canvas id="c-hr"></canvas></div>
-            <div class="tier"><span class="tier-tag">MOTION</span><canvas id="c-move"></canvas></div>
-        </div>
-
-        <h3 style="font-size: 13px; text-transform: uppercase;">Devices Used</h3>
-        <div style="display:flex; gap:10px;">
-            <button class="nav-btn" onclick="openDevice('omronPanel')">Omron</button>
-            <button class="nav-btn" onclick="openDevice('welluePanel')">Wellue</button>
-        </div>
-    </div>
-</div>
-
-<!-- OMRON DEVICE PANEL (SLIDES FROM RIGHT OVER ANALYSIS) -->
-<div id="omronPanel" class="side-panel">
-    <div class="pop-out device-card-content">
-        <div class="close-btn" onclick="closeDevice('omronPanel')">&times;</div>
-        <h1 class="brand-title">Omron</h1>
-        <div class="model-subtitle">NightView</div>
-        <div class="image-container"><img src="images/nightview.png"></div>
-        <div class="description-box">
-            <p>Clinically validated, silent, wrist-worn blood pressure monitor specifically designed for nocturnal use. Enables automatic tracking without disturbing sleep.</p>
-        </div>
-        <div class="cert-footer">
-            <div class="cert-unit"><img src="images/esh.png"><span>ESH</span></div>
-            <div class="cert-unit"><img src="images/ce-mark.png"><span>MDD IIa</span></div>
-            <div class="cert-unit"><img src="images/iso.png"><span>ISO</span></div>
-            <div class="cert-unit"><img src="images/bihs.png"><span>BIHS</span></div>
-        </div>
-    </div>
-</div>
-
-<!-- WELLUE DEVICE PANEL -->
-<div id="welluePanel" class="side-panel">
-    <div class="pop-out device-card-content">
-        <div class="close-btn" onclick="closeDevice('welluePanel')">&times;</div>
-        <h1 class="brand-title">Wellue</h1>
-        <div class="model-subtitle">O2Ring S</div>
-        <div class="image-container"><img src="images/o2ring.png"></div>
-        <div class="description-box">
-            <p>Medical-grade wearable oximeter for continuous monitoring. Features patented silicone ring sensor and haptic vibration for hypoxia events.</p>
-        </div>
-        <div class="cert-footer">
-            <div class="cert-unit"><img src="images/ce-mark.png"><span>CE Medical</span></div>
-            <div class="cert-unit"><img src="images/fda-logo.png"><span>FDA Cleared</span></div>
-            <div class="cert-unit"><img src="images/fcc-logo.png"><span>FCC Cert</span></div>
-            <div class="cert-unit"><img src="images/bluetooth.png"><span>Bluetooth</span></div>
-        </div>
-    </div>
-</div>
-
-<script>
-    /* --- ALL YOUR ORIGINAL JAVASCRIPT LOGIC --- */
-    let isCOPDMode = false;
-    const rawData = [
-        {level: 99, hr: 60, date: '16 Jan', time: '10:45 AM', type: 'Spot'},
-        {level: 89, hr: 74, date: '15 Jan', time: '03:10 AM', type: 'Night'}
-    ];
-
-    function getClinicalData(val) {
-        if (!isCOPDMode) {
-            if (val >= 95) return {label: 'Optimal', color: 'var(--c-optimal)', anim: '', info: "HEALTHY: Saturation is optimal."};
-            if (val >= 88) return {label: 'Below Target', color: 'var(--c-low)', anim: 'is-below', info: "ADVICE: Sit upright."};
-            return {label: 'Critical', color: 'var(--c-hypoxic)', anim: 'is-critical', info: "EMERGENCY: Levels low."};
-        } else {
-            if (val >= 88 && val <= 92) return {label: 'Optimal (COPD)', color: 'var(--c-optimal)', anim: '', info: "EXCELLENT."};
-            return {label: 'Critical', color: 'var(--c-hypoxic)', anim: 'is-critical', info: "CRITICAL."};
-        }
-    }
-
-    function render() {
-        const container = document.getElementById('spo2-container');
-        container.innerHTML = '';
-        rawData.forEach(item => {
-            const clinical = getClinicalData(item.level);
-            const card = document.createElement('div');
-            card.className = 'spo2-card';
-            card.innerHTML = `
-                <div class="corner-status" style="background: ${clinical.color};">${clinical.label}</div>
-                <div class="lung-interact" onclick="showInfo(${item.level})"><i class="fa-solid fa-lungs lung-bg ${clinical.anim}"></i></div>
-                <div class="data-grid">
-                    <div class="pulse-side"><i class="fa-solid fa-heart" style="animation: heartBeat ${60/item.hr}s infinite;"></i><span class="pulse-val">${item.hr}</span></div>
-                    <div class="oxy-side"><div class="timestamp-box">${item.date} ${item.time}</div><div class="oxy-val" style="color: ${clinical.color};">${item.level}%</div></div>
+                <div class="dev-selection-btn" onclick="openDevice('wellueModal')">
+                    <img src="images/o2ring.png">
+                    <div style="font-size:18px; font-weight:900;">Wellue O2Ring S</div>
                 </div>
-                <div class="card-footer">
-                    <span class="type-tag">${item.
