@@ -5,69 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SpO2 Detailed Report</title>
     <style>
-        /* --- YOUR ORIGINAL ANALYSIS STYLES (UNTOUCHED) --- */
+        /* --- YOUR ANALYSIS PAGE STYLES --- */
         :root {
             --bg: #e0e5ec;
             --shadow-dark: #b8c1d1;
             --shadow-light: #ffffff;
             --oxy: #008080; --hr: #cc0000; --bp: #4b0082; --accent: #0033cc;
         }
+
         body { background: #1a1a1a; font-family: sans-serif; margin: 0; padding: 10px; overflow: hidden; }
-        .pop-out { background: var(--bg); width: 96%; margin: 2% auto; border-radius: 35px; box-sizing: border-box; box-shadow: 15px 15px 40px rgba(0,0,0,0.6); position: relative; display: flex; flex-direction: column; max-height: 92vh; overflow: hidden; }
+
+        .pop-out {
+            background: var(--bg); width: 96%; margin: 2% auto;
+            border-radius: 35px; box-sizing: border-box;
+            box-shadow: 15px 15px 40px rgba(0,0,0,0.6); 
+            position: relative; display: flex; flex-direction: column;
+            max-height: 92vh; overflow: hidden;
+        }
+
         .scroll-content { overflow-y: auto; padding: 25px; flex: 1; }
-        .close-btn-main { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; background: #e60000; color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 18px; font-weight: bold; z-index: 10; }
+
+        .close-btn {
+            position: absolute; top: 15px; right: 15px; width: 32px; height: 32px;
+            background: #e60000; color: white; display: flex; align-items: center; 
+            justify-content: center; border-radius: 8px; font-size: 18px; font-weight: bold; z-index: 10;
+        }
+
         h2 { font-size: 24px; margin: 0 0 5px 0; font-weight: 900; }
         .date-sub { font-size: 13px; font-weight: 700; opacity: 0.5; margin-bottom: 20px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;
+            background: rgba(255,255,255,0.4); padding: 15px; border-radius: 20px;
+        }
         .stat-box { display: flex; flex-direction: column; }
         .lbl { font-size: 11px; font-weight: 800; opacity: 0.5; text-transform: uppercase; margin-bottom: 4px; }
         .val { font-size: 30px; font-weight: 900; line-height: 1; min-height: 30px; }
-        #dynamic-row { grid-column: span 2; padding-top: 12px; margin-top: 5px; border-top: 2px solid rgba(0,0,0,0.05); min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        
+        #dynamic-row { 
+            grid-column: span 2; padding-top: 12px; margin-top: 5px; 
+            border-top: 2px solid rgba(0,0,0,0.05); min-height: 40px; 
+            display: flex; align-items: center; justify-content: center;
+        }
+
         #instruction-text { font-size: 15px; font-weight: 800; color: #444; text-align: center; }
         #bp-display { width: 100%; display: none; justify-content: space-between; align-items: center; }
         .bp-val { font-size: 26px; font-weight: 900; color: var(--bp); }
-        .chart-frame { width: 100%; height: 260px; background: var(--bg); border-radius: 25px; box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light); margin: 15px 0; position: relative; touch-action: none; display: flex; flex-direction: column; overflow: hidden; padding: 5px 0; }
+
+        .chart-frame {
+            width: 100%; height: 260px; background: var(--bg); border-radius: 25px;
+            box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light);
+            margin: 15px 0; position: relative; touch-action: none;
+            display: flex; flex-direction: column; overflow: hidden; padding: 5px 0;
+        }
         .tier { flex: 1; position: relative; }
         .tier-tag { position: absolute; top: 5px; left: 10px; font-size: 9px; font-weight: 900; opacity: 0.3; }
         canvas { width: 100%; height: 100%; display: block; }
         #hairline { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); display: none; z-index: 10; }
-        .report-card { background: rgba(255,255,255,0.3); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 4px 4px 10px var(--shadow-dark); }
+
+        .report-card {
+            background: rgba(255,255,255,0.3); border-radius: 20px; padding: 20px; margin-bottom: 15px;
+            box-shadow: 4px 4px 10px var(--shadow-dark);
+        }
         .data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .data-val { font-size: 16px; font-weight: 900; }
-        .meter-bar { width: 100px; height: 10px; border-radius: 5px; background: linear-gradient(to right, #cc0000, #ffcc00, #008080); position: relative; }
-        .meter-ptr { position: absolute; top: -4px; width: 3px; height: 18px; background: #000; border-radius: 2px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 15px; }
-        th { text-align: left; opacity: 0.5; padding-bottom: 10px; font-weight: 800; text-transform: uppercase; font-size: 12px; }
-        td { padding: 12px 0; border-top: 1px solid rgba(0,0,0,0.05); font-weight: 800; }
-        .notes-area { width: 100%; height: 100px; background: rgba(255,255,255,0.5); border-radius: 15px; border: 1px solid #bbb; padding: 12px; box-sizing: border-box; font-family: inherit; font-size: 16px; margin-top: 12px; }
-        .device-container { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-bottom: 40px;}
-        .dev-btn { display: flex; align-items: center; gap: 20px; padding: 15px; background: rgba(255,255,255,0.6); border-radius: 10px; border: 1px solid #bbb; box-shadow: 6px 6px 12px rgba(0,0,0,0.08); cursor: pointer; }
-        .dev-btn img { width: 80px; height: 80px; border-radius: 5px; background: #fff; object-fit: contain; }
-        .dev-name { font-size: 18px; font-weight: 900; color: #1a1c20; }
-
-        /* --- THE FLOW SYSTEM (SLIDE FROM LEFT) --- */
-        #wellueDrawer {
-            position: fixed; top: 0; left: -100%; width: 100%; height: 100%;
-            background: rgba(18, 18, 18, 0.95); z-index: 30000; 
-            transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; justify-content: center;
-        }
-        #wellueDrawer.open { left: 0; }
-
-        /* --- YOUR ORIGINAL DEVICE CARD STYLES (UNTOUCHED) --- */
-        .device-card {
-            background: #e0e5ec; width: 92%; max-width: 480px; border-radius: 50px;
-            padding: 25px 40px 40px 40px; box-shadow: 30px 30px 60px rgba(0,0,0,0.8);
-            text-align: center; box-sizing: border-box; position: relative;
-        }
-        .close-btn-device {
-            position: absolute; top: 20px; right: 25px; width: 35px; height: 35px;
-            background: #d63031; color: white; border-radius: 10px; display: flex;
-            align-items: center; justify-content: center; font-size: 22px; font-weight: bold;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.3); cursor: pointer;
-        }
-        .brand-title { font-size: 34px; font-weight: 900; color: #1a1c20; margin: 0; padding-top: 10px; }
-        .model-subtitle { font-size: 16px; font-weight: 700; color: #57606f; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; }
-        .image-container { width: 160px; height: 160px; margin: 0 auto 30px auto; background: #e0e5ec; border-radius: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 12px 12px 25px #b8c1d1, -12px -12px 25px #ffffff; padding: 20px; box-sizing: border-box; }
-        .image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .description-box { background: rgba(255, 255, 255, 0.4); border-radius: 25px; padding: 25px; text-align: left; box-shadow: inset 5px 5px 10px #b8c1d1, inset -5px -5px 10px #ffffff; margin-botto
+        .data-row:last-child { border: none; }
+        .data-lbl { font-size: 16px; font-weight: 700; opacity: 0.8; }
+        .data-val { fo
