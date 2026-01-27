@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BP Tracker - Add</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <img src="https://github.com/duilsk/health-app/blob/main/app_logo.png?raw=true" width="80" alt="Logo">
+        <h1>Add BP Reading</h1>
+        
+        <div class="input-box">
+            <label>Systolic (Top)</label>
+            <input type="number" id="sys" placeholder="120">
+        </div>
+        <div class="input-box">
+            <label>Diastolic (Bottom)</label>
+            <input type="number" id="dia" placeholder="80">
+        </div>
+        
+        <button id="btnSave" class="btn-main">Save Manual Reading</button>
+        
+        <div class="divider">OR</div>
+        
+        <button id="btnSync" class="btn-sync">🔄 Sync from Health Connect</button>
+        
+        <hr>
+        <a href="view.html" class="nav-link">View History →</a>
+    </div>
+
+    <!-- This loads the Capacitor bridge -->
+    <script src="capacitor.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
